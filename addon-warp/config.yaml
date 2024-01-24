@@ -12,8 +12,8 @@ arch:
   - i386
 host_network: "true"
 options:
-  warp_ip_address:
-  wol_mac_address:
+  warp_ip_address: "192.168.0.9"
+  wol_mac_address: "b7:40:e1:98:d0:95"
   network_interface: eth0
   broadcast_ip: "192.168.0.255"
   subnet_mask: "24"
