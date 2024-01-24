@@ -56,16 +56,10 @@ fi;
 mycmd=wake-on-arp
 
 bashio::log.info "Creating list of network clients"
-bashio::log.info
-bashio::log.info "$(awk 'BEGIN {printf("%19s | %18s | %16s | %s\n", "Network Interface", "MAC Address", "IP Address", "Network Client")}')"
-bashio::log.info "--------------------+--------------------+------------------+------------------"
-bashio::log.info "$(arp | tr -d {}[]\(\) | awk '!/incomplete/ && !/hassio/ && !/docker0/ {printf("%19s | %18s | %16s | %s\n", $7, $4, $2, $1)}')"
-bashio::log.info
+echo
+awk 'BEGIN {printf("%19s | %18s | %16s | %s\n", "Network Interface", "MAC Address", "IP Address", "Network Client")}'
+echo "--------------------+--------------------+------------------+------------------"
+arp | tr -d {}[]\(\) | awk '!/incomplete/ && !/hassio/ && !/docker0/ {printf("%19s | %18s | %16s | %s\n", $7, $4, $2, $1)}'
+echo
 bashio::log.info "Starting ${mycmd[@]} service"
-exec ${mycmd[@]}
-
-# Network device to scan on
-# Net mask that describes which source IP's are allowed
-# Allow the gateway (your router) to send ARP requests, stops misbehaving routers
-# Ignores ARP requests from this IP (you can add as many of these as you like)
-
+exec ${mycmd[@]} | head
