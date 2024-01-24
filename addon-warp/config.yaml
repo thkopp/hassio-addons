@@ -1,0 +1,27 @@
+name: "WARP"
+description: Wake-on-ARP server
+version: "0.0.1"
+slug: "warp"
+init: "false"
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+host_network: "true"
+options:
+  warp_ip_address:
+  wol_mac_address:
+  network_interface: eth0
+  broadcast_ip: "192.168.0.255"
+  subnet_mask: "24"
+  allow_gateway: false
+
+schema:
+  warp_ip_address: "str"
+  wol_mac_address: "str"
+  network_interface: "str"
+  broadcast_ip: "str"
+  subnet_mask: "str"
+  allow_gateway: "bool?"
