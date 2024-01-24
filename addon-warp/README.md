@@ -3,7 +3,7 @@
 WARP - Wake on ARP<br>
 An ARP based wake on LAN server
 
-![Supports aarch64 Architecture][aarch64-shield] ![Supports amd64 Architecture][amd64-shield] ![Supports armhf Architecture][armhf-shield] ![Supports armv7 Architecture][armv7-shield] ![Supports i386 Architecture][i386-shield] [![license][gplv3-shield]](license.MD)
+![Supports aarch64 Architecture][aarch64-shield] ![Supports amd64 Architecture][amd64-shield] ![Supports armhf Architecture][armhf-shield] ![Supports armv7 Architecture][armv7-shield] ![Supports i386 Architecture][i386-shield] [![license][gplv3-shield]](LICENSE.md)
 
 This add-on provides a Wake-on-ARP server for your network. It listens for ARP requests to trigger Wake-on-LAN Magic packets.<br>
 <br>
