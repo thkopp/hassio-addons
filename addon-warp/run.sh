@@ -62,4 +62,4 @@ echo "--------------------+--------------------+------------------+-------------
 arp | tr -d {}[]\(\) | awk '!/incomplete/ && !/hassio/ && !/docker0/ {printf("%19s | %18s | %16s | %s\n", $7, $4, $2, $1)}'
 echo
 bashio::log.info "Starting ${mycmd[@]} service"
-exec ${mycmd[@]} | head
+exec ${mycmd[@]}
