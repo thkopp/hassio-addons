@@ -12,17 +12,26 @@ arch:
   - i386
 host_network: "true"
 options:
-  warp_ip_address: "192.168.0.9"
-  wol_mac_address: "b7:40:e1:98:d0:95"
-  network_interface: eth0
+  target_ip_1: "192.168.0.9"
+  target_mac_1: "b7:40:e1:98:d0:95"
+  network_interface: "eth0"
   broadcast_ip: "192.168.0.255"
   subnet_mask: "24"
   allow_gateway: false
-
+  ip_mac_pairs_opt:
+    - target_ip: ""
+      target_mac: ""
+  blacklist:
+    - exclude_source: ""
 schema:
-  warp_ip_address: "str"
-  wol_mac_address: "str"
+  target_ip_1: "str"
+  target_mac_1: "str"
   network_interface: "str"
   broadcast_ip: "str"
   subnet_mask: "str"
-  allow_gateway: "bool?"
+  allow_gateway: "bool"
+  ip_mac_pairs_opt:
+    - target_ip: "str?"
+      target_mac: "str?"
+  blacklist:
+    - exclude_source: "str?"
