@@ -23,20 +23,20 @@ ALLOW_GATEWAY=$(bashio::config 'allow_gateway')
 
 {
   echo "# Target IP and MAC address pairs"
-  echo "target_ip_1 " $(bashio::config 'target_ip_1')
-  echo "target_mac_1 " $(bashio::config 'target_mac_1')
+  echo "target_ip_1          $(bashio::config 'target_ip_1')"
+  echo "target_mac_1         $(bashio::config 'target_mac_1')"
   echo
   echo "# Network device to scan on"
-  echo "net_device ${NETWORK_INTERFACE}"
+  echo "net_device           ${NETWORK_INTERFACE}"
   echo
   echo "# Broadcast IP address"
-  echo "broadcast_ip ${BROADCAST_IP}"
+  echo "broadcast_ip         ${BROADCAST_IP}"
   echo
   echo "# Net mask that describes which source IP's are allowed"
-  echo "subnet ${SUBNET_MASK}"
+  echo "subnet               ${SUBNET_MASK}"
   echo
   echo "# Allow wake on arp requests from the gateway"
-  echo "allow_gateway ${ALLOW_GATEWAY}"
+  echo "allow_gateway        ${ALLOW_GATEWAY}"
   echo
   echo "# Ignores ARP requests from this IP (you can add as many of these as you like)"
   echo "source_exclude 192.168.1.5"
@@ -48,7 +48,8 @@ bashio::log.info "Creating list of network clients"
 echo
 awk 'BEGIN {printf("%19s | %18s | %16s | %s\n", "Network Interface", "MAC Address", "IP Address", "Network Client")}'
 echo "--------------------+--------------------+------------------+------------------"
-arp | tr -d {}[]\(\) | awk '!/incomplete/ && !/hassio/ && !/docker0/ {printf("%19s | %18s | %16s | %s\n", $7, $4, $2, $1)}'
+arp | tr -d '{}[]\(\)' | awk '!/incomplete/ && !/hassio/ && !/docker0/ {printf("%19s | %18s | %16s | %s\n", $7, $4, $2, $1)}'
 echo
+# shellcheck disable=SC2145
 bashio::log.info "Starting ${mycmd[@]} service"
-exec ${mycmd[@]}
+exec "${mycmd[@]}"
