@@ -42,14 +42,12 @@ ALLOW_GATEWAY=$(bashio::config 'allow_gateway')
   echo "source_exclude 192.168.1.5"
 } > "${CONFIG}"
 
-mycmd=wake-on-arp
 
 bashio::log.info "Creating list of network clients"
-echo
-awk 'BEGIN {printf("%19s | %18s | %16s | %s\n", "Network Interface", "MAC Address", "IP Address", "Network Client")}'
-echo "--------------------+--------------------+------------------+------------------"
-arp | tr -d '{}[]\(\)' | awk '!/incomplete/ && !/hassio/ && !/docker0/ {printf("%19s | %18s | %16s | %s\n", $7, $4, $2, $1)}'
-echo
-# shellcheck disable=SC2145
-bashio::log.info "Starting ${mycmd[@]} service"
-exec "${mycmd[@]}"
+bashio::log.green "$(printf '\t\t+--------------------+--------------------+------------------+------------------+\n')"
+bashio::log.green "$(awk 'BEGIN {printf("\t\t| %-18s | %-18s | %-16s | %-16s |\n", "Network Interface", "MAC Address", "IP Address", "Network Client")}')"
+bashio::log.green "$(printf '\t\t+--------------------+--------------------+------------------+------------------+\n')"
+bashio::log.green "$(arp | tr -d '{}[]\(\)' | awk '!/incomplete/ && !/hassio/ && !/docker0/ {printf("\t\t| %-18s | %-18s | %-16s | %-16s |\n", $7, $4, $2, $1)}')"
+bashio::log.green "$(printf '\t\t+--------------------+--------------------+------------------+------------------+\n')"
+bashio::log.info "Starting wake-on-arp service"
+exec wake-on-arp | ts '[%Y-%m-%d %H:%M:%S]'
