@@ -1,7 +1,7 @@
 name: "WARP"
 description: Wake-on-ARP server
 url: https://github.com/thkopp/hassio-addons/tree/main/addon-warp
-version: "0.0.3"
+version: "0.0.4"
 slug: "warp"
 init: "false"
 arch:
