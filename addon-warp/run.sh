@@ -44,10 +44,11 @@ ALLOW_GATEWAY=$(bashio::config 'allow_gateway')
 
 
 bashio::log.info "Creating list of network clients"
-bashio::log.green "$(printf '\t\t+--------------------+--------------------+------------------+------------------+\n')"
-bashio::log.green "$(awk 'BEGIN {printf("\t\t| %-18s | %-18s | %-16s | %-16s |\n", "Network Interface", "MAC Address", "IP Address", "Network Client")}')"
-bashio::log.green "$(printf '\t\t+--------------------+--------------------+------------------+------------------+\n')"
-bashio::log.green "$(arp | tr -d '{}[]\(\)' | awk '!/incomplete/ && !/hassio/ && !/docker0/ {printf("\t\t| %-18s | %-18s | %-16s | %-16s |\n", $7, $4, $2, $1)}')"
-bashio::log.green "$(printf '\t\t+--------------------+--------------------+------------------+------------------+\n')"
+bashio::log.green "$(printf '\t+----------------+--------------------+------------------+--------------------------------+\n')"
+bashio::log.green "$(awk 'BEGIN {printf("\t| %-14s | %-18s | %-16s | %-30s |\n", "INTERFACE", "MAC ADDRESS", "IP ADDRESS", "HOSTNAME")}')"
+bashio::log.green "$(printf '\t+----------------+--------------------+------------------+--------------------------------+\n')"
+bashio::log.green "$(arp | tr -d '{}[]\(\)' | awk '!/incomplete/ && !/hassio/ && !/docker0/ {printf("\t| %-14s | %-18s | %-16s | %-30s |\n", $7, $4, $2, substr($1,1,30))}')"
+bashio::log.green "$(printf '\t+----------------+--------------------+------------------+--------------------------------+\n')"
 bashio::log.info "Starting wake-on-arp service"
 exec wake-on-arp | ts '[%Y-%m-%d %H:%M:%S]'
+
