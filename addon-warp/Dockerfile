@@ -12,7 +12,7 @@ WORKDIR /
 COPY run.sh /
 RUN chmod a+x /run.sh
 
-RUN apk del g++ make linux-headers git moreutils
+RUN apk del g++ make linux-headers git
 RUN rm -rf /wake-on-arp.git
 
 CMD [ "/run.sh" ]
