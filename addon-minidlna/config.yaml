@@ -24,7 +24,6 @@ options:
   model_number: "1"
 
 schema:
-  media_database: "str"
   inotify: "str"
   port: "str"
   media_dir: "str"

@@ -9,19 +9,6 @@ set -e
 CONFIG="/etc/minidlna.conf"
 bashio::log.info "Creating MiniDLNA configuration ${CONFIG}"
 
-# Declare variables
-declare port
-declare media_dir
-declare album_art_names
-declare inotify
-declare enable_tivo
-declare tivo_discovery
-declare strict_dlna
-declare notify_interval
-declare serial
-declare model_number
-
-
 {
   echo "port=$(bashio::config 'port')"
   echo "media_dir=$(bashio::config 'media_dir')"
@@ -33,7 +20,6 @@ declare model_number
   echo "notify_interval=$(bashio::config 'notify_interval')"
   echo "serial=$(bashio::config 'serial')"
   echo "model_number=$(bashio::config 'model_number')"
-  echo "=$(bashio::config '')"
 } > "${CONFIG}"
 
 bashio::log.info "Starting MiniDLNA service"
