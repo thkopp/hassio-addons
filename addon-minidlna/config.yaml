@@ -12,8 +12,29 @@ arch:
   - i386
 host_network: "true"
 options:
-  music: "/media/music"
+  port: "8200"
+  media_dir: "/media"
+  album_art_names: "Cover.jpg/cover.jpg/AlbumArtSmall.jpg/albumartsmall.jpg/AlbumArt.jpg/albumart.jpg/Album.jpg/album.jpg/Folder.jpg/folder.jpg/Thumb.jpg/thumb.jpg"
   inotify: "no"
+  enable_tivo: "no"
+  tivo_discovery: "bonjour"
+  strict_dlna: "no"
+  notify_interval: "900"
+  serial: "12345678"
+  model_number: "1"
+
 schema:
   media_database: "str"
   inotify: "str"
+  port: "str"
+  media_dir: "str"
+  album_art_names: "str"
+  inotify: "str"
+  enable_tivo: "str"
+  tivo_discovery: "str"
+  strict_dlna: "str"
+  notify_interval: "str"
+  serial: "str"
+  model_number: "str"
+
+
