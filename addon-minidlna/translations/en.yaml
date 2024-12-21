@@ -1,0 +1,34 @@
+---
+configuration:
+  target_mac_1:
+    name: WOL MAC address
+    description: >-
+      Destination MAC address of wake on LAN magic packet
+  target_ip_1:
+    name: ARP listening IP address
+    description: >-
+      IP address of the destination to wake up with magic packet
+  network_interface:
+    name: Network interface name
+    description: >-
+      Network settings to use for ARP listening and WOL
+  broadcast_ip:
+    name: Broadcast IP address
+  subnet_mask:
+    name: Subnet mask
+  source_exclude:
+    name: Exclude source IPs
+    description: >-
+      Ignores ARP requests from this IPs (you can add as many of these as you like)
+  allow_gateway:
+    name: Allow gateway
+    description: >-
+      Enables the gateway as source for ARP (default=false)
+  ip_mac_pairs_opt:
+    name: IP / MAC
+    description: >-
+      Pairs of target IP and MAC addresses
+  blacklist_opt:
+    name: Blacklist
+    description: >-
+      Block source IP address
