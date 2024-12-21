@@ -15,7 +15,7 @@ declare inotify
 
 
 # Create main config
-media_dir_A=$(bashio::config 'A,/media/music')                   
+media_dir_A=$(bashio::config "A,/media/music")
 inotify=$(bashio::config 'no')                                   # 'no' for less resources, restart required for new media
 
 {
@@ -25,5 +25,6 @@ inotify=$(bashio::config 'no')                                   # 'no' for less
 
 
 bashio::log.info "Starting MiniDLNA service"
-exec minidlnad  | ts '[%Y-%m-%d %H:%M:%S]'
+exec minidlnad  
+#| ts '[%Y-%m-%d %H:%M:%S]'
 
