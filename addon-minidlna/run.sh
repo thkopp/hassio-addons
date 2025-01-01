@@ -23,6 +23,6 @@ bashio::log.info "Creating MiniDLNA configuration ${CONFIG}"
 } > "${CONFIG}"
 
 bashio::log.info "Starting MiniDLNA service"
-exec minidlnad  
+minidlnad  
 #| ts '[%Y-%m-%d %H:%M:%S]'
 
