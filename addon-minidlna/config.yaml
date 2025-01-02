@@ -1,7 +1,7 @@
 name: "MiniDLNA"
 description: DLNA-Server
 url: https://github.com/thkopp/hassio-addons/tree/main/addon-minidlna
-version: "0.0.4.5"
+version: "0.0.4.6"
 slug: "minidlna"
 init: "false"
 arch:
@@ -11,6 +11,10 @@ arch:
   - armv7
   - i386
 host_network: "true"
+
+map:
+  - media:r
+
 options:
   port: "8200"
   media_dir: "/media"
