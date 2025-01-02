@@ -13,7 +13,7 @@ arch:
 host_network: "true"
 
 map:
-  - media:r
+  media: r
 
 options:
   port: "8200"
