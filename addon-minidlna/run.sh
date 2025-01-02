@@ -22,8 +22,9 @@ bashio::log.info "Creating MiniDLNA configuration ${CONFIG}"
   echo "model_number=$(bashio::config 'model_number')"
 } > "${CONFIG}"
 
-echo "${CONFIG}"
+cat "${CONFIG}"
 bashio::log.info "Starting MiniDLNA service"
-minidlnad
-#| ts '[%Y-%m-%d %H:%M:%S]'
+exec minidlnad -f "${CONFIG}"
+bashio::log.info "Stopping MiniDLNA service"
+
 

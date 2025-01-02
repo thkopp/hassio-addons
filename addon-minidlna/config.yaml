@@ -1,7 +1,7 @@
 name: "MiniDLNA"
 description: DLNA-Server
 url: https://github.com/thkopp/hassio-addons/tree/main/addon-minidlna
-version: "0.0.4"
+version: "0.0.4.3"
 slug: "minidlna"
 init: "false"
 arch:
