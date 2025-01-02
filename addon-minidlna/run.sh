@@ -24,7 +24,7 @@ bashio::log.info "Creating MiniDLNA configuration ${CONFIG}"
 
 cat "${CONFIG}"
 bashio::log.info "Starting MiniDLNA service"
-exec minidlnad -f "${CONFIG}"
+exec minidlnad -f "${CONFIG}" -d
 bashio::log.info "Stopping MiniDLNA service"
 
 
