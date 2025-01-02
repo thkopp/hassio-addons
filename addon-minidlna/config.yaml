@@ -1,7 +1,7 @@
 name: "MiniDLNA"
 description: DLNA-Server
 url: https://github.com/thkopp/hassio-addons/tree/main/addon-minidlna
-version: "0.0.4.6"
+version: "0.0.4.7"
 slug: "minidlna"
 init: "false"
 arch:
@@ -16,6 +16,7 @@ map:
   media: r
 
 options:
+  friendly_name: "MiniDLNA"
   port: "8200"
   media_dir: "/media"
   album_art_names: "Cover.jpg/cover.jpg/AlbumArtSmall.jpg/albumartsmall.jpg/AlbumArt.jpg/albumart.jpg/Album.jpg/album.jpg/Folder.jpg/folder.jpg/Thumb.jpg/thumb.jpg"
@@ -28,6 +29,7 @@ options:
   model_number: "1"
 
 schema:
+  friendly_name: "str"
   inotify: "str"
   port: "str"
   media_dir: "str"

@@ -10,6 +10,7 @@ CONFIG="/etc/minidlna.conf"
 bashio::log.info "Creating MiniDLNA configuration ${CONFIG}"
 
 {
+  echo "friendly_name=$(bashio::config 'friendly_name')"
   echo "port=$(bashio::config 'port')"
   echo "media_dir=$(bashio::config 'media_dir')"
   echo "album_art_names=$(bashio::config 'album_art_names')"
