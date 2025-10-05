@@ -1,62 +1,39 @@
-name: Shelly Emulator
+name: "Shelly Emulator"
+description: "Simuliert Shelly-Geräte mit lokalen Sensorwerten aus Home Assistant. Exponiert eine REST-API und mDNS für die LAN-Integration."
 version: "1.0.0"
-slug: shelly_emulator
-description: >
-  Simuliert Shelly-Geräte mit lokalen Sensorwerten aus Home Assistant.
-  Exponiert eine REST-API und mDNS für die LAN-Integration.
+slug: "shelly_emulator"
+
+init: false
 
 arch:
   - amd64
   - armv7
   - aarch64
 
-startup: application
-boot: auto
-
 ports:
   8080/tcp: 8080
   5683/udp: 5683
 
-map:
-  - type: share
-    name: config
-    path: /config/shelly_emulator
-
-webui: "http://[HOST]:[PORT:8080]/status"
-
-panel_icon: mdi:router-wireless
-panel_title: Shelly Emulator
-
-environment:
-  HA_URL: "http://homeassistant:8123"
-  HA_TOKEN: "dein_long_lived_access_token"
-
 options:
   device_name: "shelly-emu"
-  port: 8080
-  mDNS: true
-  coap: false
-  mappings:
-    device_id: "shelly-emulator-1"
-    relays:
-      "0": "switch.kitchen_socket"
-    sensors:
-      temperature: "sensor.livingroom_temperature"
+  port: "8080"
+  mDNS: "true"
+  coap: "false"
+  device_id: "shelly-emulator-1"
+  relays:
+    - "0:switch.kitchen_socket"
+  sensors:
+    - "temperature:sensor.livingroom_temperature"
+  ha_token: ""
 
 schema:
-  device_name: str
-  port: int
-  mDNS: bool
-  coap: bool
-  mappings:
-    device_id: str
-    relays:
-      type: dict
-      schema:
-        key: str
-        value: str
-    sensors:
-      type: dict
-      schema:
-        key: str
-        value: str
+  device_name: "str"
+  port: "int"
+  mDNS: "bool"
+  coap: "bool"
+  device_id: "str"
+  relays:
+    - "str"
+  sensors:
+    - "str"
+  ha_token: "str"
