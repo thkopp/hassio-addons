@@ -4,8 +4,8 @@
 bashio::log.info "Starte Shelly Emulator..."
 
 # Home Assistant URL und Token aus Add-on-Umgebungsvariablen
-export HA_URL="http://supervisor/core"
-export HA_TOKEN=$(bashio::config 'ha_token')
+#export HA_URL="http://supervisor/core"
+#export HA_TOKEN=$(bashio::config 'ha_token')
 
 # Python-Skript starten
 python3 /app/main.py
