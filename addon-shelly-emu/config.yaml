@@ -1,6 +1,6 @@
 name: "Shelly Pro 3EM Emulator"
 description: "Emuliert ein Shelly Pro 3EM mit lokalen Sensorwerten"
-version: "0.0.0.81"
+version: "0.0.0.8"
 url: https://github.com/thkopp/hassio-addons/tree/main/addon-shelly-emu
 slug: "shelly_emulator"
 
@@ -22,9 +22,11 @@ panel_title: "Shelly Pro 3EM Emu"
 ports:
   1010/tcp: 1010
   5353/udp: 5353
-ports_description:
-  "1010/tcp:": "RPC port of shelly-emu for provisioning data to third party devices like a storage. Alternative port is e.g. 2220."
-  "5353": "For zerofconf discovery."
+
+### currently not accepted by HA
+# ports_description:
+#  1010/tcp:: "RPC port of shelly-emu for provisioning data to third party devices like a storage. Alternative port is e.g. 2220."
+#  5353/udp: "For zerofconf discovery."
 
 options:
   ha_connect:
