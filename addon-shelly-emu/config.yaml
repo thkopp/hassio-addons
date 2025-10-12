@@ -1,6 +1,6 @@
 name: "Shelly Pro 3EM Emulator"
 description: "Emuliert ein Shelly Pro 3EM mit lokalen Sensorwerten"
-version: "0.0.0.91"
+version: "0.0.0.92"
 url: https://github.com/thkopp/hassio-addons/tree/main/addon-shelly-emu
 slug: "shelly_emulator"
 
@@ -20,6 +20,7 @@ panel_icon: "icon: mdi:meter-electric-outline"
 panel_title: "Shelly Pro 3EM Emu"
 
 ports:
+  8080/tcp: 8080
   1010/tcp: 1010
   5353/udp: 5353
 
