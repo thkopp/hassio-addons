@@ -103,6 +103,7 @@
     </div>
   </div>
 
+  <!-- ### comment start ###
   <div class="section">
     <h2>Leistung summiert</h2>
     <div class="section-row">
@@ -115,6 +116,7 @@
       </div>
     </div>
   </div>
+  ### comment end ### -->
 </div>
 
 <div class="container" id="phases"></div>
@@ -124,7 +126,7 @@ const baseUrl = "http://localhost:1010";
 const maxDataPoints = 30;
 const phasePowerCharts = [];
 const phasePowerData = [[], [], []];
-const phasePhiData = [[], [], []];
+// const phasePhiData = [[], [], []];
 const maxTotalPower = 15000;
 const maxTotalEnergy = 100000;
 
@@ -153,16 +155,16 @@ function createPhaseDiv(idx) {
   const div = document.createElement('div');
   div.className = 'box';
   div.innerHTML = `
-    <h2>L${idx + 1}</h2>
+    <!-- <h2>L${idx + 1}</h2> -->
     <table>
-      <tr><th>P</th>
+      <tr><th>Leistung L${idx + 1}</th>
         <td>
           <div class="bar-container"><div id="barP${idx}" class="bar"></div></div>
           <div class="value-unit">
             <span class="number" id="p${idx}">0</span><span class="unit">W</span>
           </div>
         </td>
-      </tr>
+      <!-- ### comment start ###
       <tr><th>U</th>
         <td>
           <div class="bar-container"><div id="barV${idx}" class="bar"></div></div>
@@ -187,6 +189,7 @@ function createPhaseDiv(idx) {
           </div>
         </td>
       </tr>
+      ### comment end ### -->
     </table>
     <canvas id="chart${idx}"></canvas>
   `;
@@ -198,15 +201,15 @@ function createPhaseDiv(idx) {
     data: {
       labels: Array(maxDataPoints).fill(''),
       datasets: [
-        {
-          label: 'φ',
-          data: Array(maxDataPoints).fill(0),
-          //borderColor: 'blue',
-          //backgroundColor: 'rgba(0,0,255,0.15)',
-          yAxisID: 'yPhi',
-          tension: 0.3,
-          pointRadius: 0
-        },
+        // {
+        //   label: 'φ',
+        //   data: Array(maxDataPoints).fill(0),
+        //   borderColor: 'blue',
+        //   backgroundColor: 'rgba(0,0,255,0.15)',
+        //   yAxisID: 'yPhi',
+        //   tension: 0.3,
+        //   pointRadius: 0
+        // },
         {
           label: 'P',
           data: Array(maxDataPoints).fill(0),
@@ -222,7 +225,7 @@ function createPhaseDiv(idx) {
       animation: false,
       responsive: true,
       plugins: {
-        legend: { display: true, labels: { boxWidth: 12 }, position: 'bottom' }
+        legend: { display: false, labels: { boxWidth: 12 }, position: 'bottom' }
       },
       scales: {
         // x: {
@@ -235,19 +238,20 @@ function createPhaseDiv(idx) {
           position: 'left',
           ticks: {
             callback: function(value) {
-              return Math.round(value)+" °"; // nur ganze Zahlen
-            }
-          }
-        },
-        yPhi: {
-          type: 'linear',
-          position: 'left',
-          ticks: {
-            callback: function(value) {
               return Math.round(value)+" W"; // nur ganze Zahlen
             }
           }
         }
+        // ,
+        // yPhi: {
+        //   type: 'linear',
+        //   position: 'left',
+        //   ticks: {
+        //     callback: function(value) {
+        //       return Math.round(value)+" °"; // nur ganze Zahlen
+        //     }
+        //   }
+        // }
       }
     }
   });
@@ -272,28 +276,28 @@ async function fetchStatus() {
       const p = Math.round(phase.power);
       combinedPower += p;
 
-      document.getElementById(`v${idx}`).textContent = v;
-      document.getElementById(`c${idx}`).textContent = c;
       document.getElementById(`p${idx}`).textContent = p;
-      document.getElementById(`phi${idx}`).textContent = phi;
-
-      document.getElementById(`barV${idx}`).style.width = Math.min((v / 250) * 100, 100) + '%';
-      document.getElementById(`barV${idx}`).style.background = getColor(v, 'voltage');
-
-      document.getElementById(`barC${idx}`).style.width = Math.min((c / 20) * 100, 100) + '%';
-      document.getElementById(`barC${idx}`).style.background = getColor(c, 'current');
+      // document.getElementById(`v${idx}`).textContent = v;
+      // document.getElementById(`c${idx}`).textContent = c;
+      // document.getElementById(`phi${idx}`).textContent = phi;
 
       document.getElementById(`barP${idx}`).style.width = Math.min((p / 5000) * 100, 100) + '%';
       document.getElementById(`barP${idx}`).style.background = getColor(p, 'power');
 
-      document.getElementById(`barPhi${idx}`).style.width = (Math.abs(phi) / 180 * 100).toFixed(1) + '%';
-      document.getElementById(`barPhi${idx}`).style.background = getColor(phi, 'phi');
+      // document.getElementById(`barV${idx}`).style.width = Math.min((v / 250) * 100, 100) + '%';
+      // document.getElementById(`barV${idx}`).style.background = getColor(v, 'voltage');
+
+      // document.getElementById(`barC${idx}`).style.width = Math.min((c / 20) * 100, 100) + '%';
+      // document.getElementById(`barC${idx}`).style.background = getColor(c, 'current');
+
+      // document.getElementById(`barPhi${idx}`).style.width = (Math.abs(phi) / 180 * 100).toFixed(1) + '%';
+      // document.getElementById(`barPhi${idx}`).style.background = getColor(phi, 'phi');
 
       // Verlauf aktualisieren
       phasePowerData[idx].push(p);
-      phasePhiData[idx].push(phi);
+      // phasePhiData[idx].push(phi);
       if (phasePowerData[idx].length > maxDataPoints) phasePowerData[idx].shift();
-      if (phasePhiData[idx].length > maxDataPoints) phasePhiData[idx].shift();
+      //if (phasePhiData[idx].length > maxDataPoints) phasePhiData[idx].shift();
 
       const powerColor = getColor(p, 'power');
       const phiColor = getColor(phi, 'phi');
@@ -305,9 +309,9 @@ async function fetchStatus() {
         `rgba(${powerColor === 'green' ? 0 : powerColor === 'orange' ? 255 : 255},
                ${powerColor === 'green' ? 255 : powerColor === 'orange' ? 165 : 0},0.15)`;
 
-      chart.data.datasets[1].data = phasePhiData[idx];
-      chart.data.datasets[1].borderColor = phiColor;
-      chart.data.datasets[1].backgroundColor = `rgba(0,0,255,0.15)`;
+      // chart.data.datasets[1].data = phasePhiData[idx];
+      // chart.data.datasets[1].borderColor = phiColor;
+      // chart.data.datasets[1].backgroundColor = `rgba(0,0,255,0.15)`;
 
       chart.update('none');
     });
@@ -317,13 +321,13 @@ async function fetchStatus() {
 
     document.getElementById('totalPowerVal').textContent = totalPower;
     document.getElementById('totalEnergyVal').textContent = totalEnergy;
-    document.getElementById('combinedPowerVal').textContent = combinedPower;
+    // document.getElementById('combinedPowerVal').textContent = combinedPower;
 
     document.getElementById('totalBar').style.width = Math.min((totalPower / maxTotalPower) * 100, 100) + '%';
     document.getElementById('totalBar').style.background = getColor(totalPower, 'power');
 
-    document.getElementById('combinedBar').style.width = Math.min((combinedPower / maxTotalPower) * 100, 100) + '%';
-    document.getElementById('combinedBar').style.background = getColor(combinedPower, 'power');
+    // document.getElementById('combinedBar').style.width = Math.min((combinedPower / maxTotalPower) * 100, 100) + '%';
+    // document.getElementById('combinedBar').style.background = getColor(combinedPower, 'power');
 
     document.getElementById('totalEnergyBar').style.width = Math.min((totalEnergy / maxTotalEnergy) * 100, 100) + '%';
     document.getElementById('totalEnergyBar').style.background = 'green';
@@ -332,7 +336,7 @@ async function fetchStatus() {
   }
 }
 
-setInterval(fetchStatus, 1000);
+setInterval(fetchStatus, 3000);
 fetchStatus();
 
 

@@ -22,7 +22,7 @@ class ShellyEmuAPI:
 
     async def start_mdns(self):
         """Registriert das Shelly-Gerät via mDNS"""
-        if not self.cfg.get("mDNS", False):
+        if not self.cfg.get("mDNS", True):
             log.info("ℹ️ mDNS deaktiviert (Config).")
             return
 
@@ -95,55 +95,102 @@ class ShellyEmuAPI:
             if not entity_id:
                 return 0.0
             val = ha.cache.get(entity_id)
+
             try:
-                return float(val) if val is not None else 0.0
-            except Exception:
+                if val in (None, "unknown", "unavailable", ""):
+                    log.debug(f"Undefined value for {entity_id}: {val}")
+                    return 0.0  # oder None, je nach gewünschtem Verhalten
+                return float(val)
+
+            except (ValueError, TypeError):
                 log.warning(f"Invalid value for {entity_id}: {val}")
                 return 0.0
 
         emeters = []
         total_power = 0.0
 
-        for phase_key in ["phase_l1", "phase_l2", "phase_l3"]:
-            phase_sensors = sensors.get(phase_key, {})
-            u = get_value(phase_sensors.get("voltage"))
-            i = get_value(phase_sensors.get("current"))
+        # for phase_key in ["phase_l1", "phase_l2", "phase_l3"]:
+        #     phase_sensors = sensors.get(phase_key, {})
+        #     u = get_value(phase_sensors.get("voltage"))
+        #     i = get_value(phase_sensors.get("current"))
 
-            phi = get_value(phase_sensors.get("phi"))
+        #     phi = get_value(phase_sensors.get("phi"))
 
-            # --- Phasenwinkel normalisieren (-180° .. +180°) ---
-            phi = ((phi + 180) % 360) - 180
+        #     # --- Phasenwinkel normalisieren (-180° .. +180°) ---
+        #     phi = ((phi + 180) % 360) - 180
 
-            power_sensor = phase_sensors.get("power")
+        #     power_sensor = phase_sensors.get("power")
 
-            # Berechne Leistung: P = U * I * cos(phi)
-            power_calc = u * i * math.cos(math.radians(phi)) if u and i else 0.0
+        #     # Berechne Leistung: P = U * I * cos(phi)
+        #     power_calc = u * i * math.cos(math.radians(phi)) if u and i else 0.0
 
-            # Wenn Power-Sensor existiert und >0, verwende ihn
-            power_meas = get_value(power_sensor)
-            power = power_meas if power_meas > 0 else power_calc
+        #     # Wenn Power-Sensor existiert und >0, verwende ihn
+        #     power_meas = get_value(power_sensor)
+        #     power = power_meas if power_meas > 0 else power_calc
 
-            emeters.append({
-                "voltage": u,
-                "current": i,
-                "phi": phi,
-                "power": round(power, 2)
-            })
-            total_power += power
+        #     emeters.append({
+        #         "voltage": u,
+        #         "current": i,
+        #         "phi": phi,
+        #         "power": round(power, 2)
+        #     })
+        #     total_power += power
 
         # Gesamtsummen
         total_cfg = sensors.get("total", {})
-        total_power_entity = total_cfg.get("power")
+        total_power_from_grid_entity = total_cfg.get("power_from_grid")
+        total_power_to_grid_entity = total_cfg.get("power_to_grid")
         total_energy_entity = total_cfg.get("energy")
 
-        total_power_final = get_value(total_power_entity) if total_power_entity else round(total_power, 2)
-        total_energy = get_value(total_energy_entity) if total_energy_entity else round(total_power / 1000, 3)
+        power_from_grid = get_value(total_power_from_grid_entity) if total_power_from_grid_entity else 0
+        power_to_grid = get_value(total_power_to_grid_entity) if total_power_to_grid_entity else 0
+        total_power_final = power_from_grid + power_to_grid
+
+        total_energy = get_value(total_energy_entity) if total_energy_entity else 0
 
         status = {
             "emeters": emeters,
             "total_power": total_power_final,
             "total_energy": total_energy
         }
+
+
+        p_sum = 0
+        for phase_key in ["phase_l1", "phase_l2", "phase_l3"]:
+            phase_sensors = sensors.get(phase_key, {})
+            u = get_value(phase_sensors.get("voltage"))
+            i = get_value(phase_sensors.get("current"))
+            p = u * i
+            p_sum += p
+
+        corr_factor = total_power_final / p_sum
+
+        for phase_key in ["phase_l1", "phase_l2", "phase_l3"]:
+            phase_sensors = sensors.get(phase_key, {})
+            u = get_value(phase_sensors.get("voltage"))
+            i = get_value(phase_sensors.get("current"))
+
+            # DIRTY HACK: using a correction factor as cos(phi) is unknown when using tibber backend data.
+            p = u * i * corr_factor
+
+            emeters.append({
+                "voltage": u,
+                "current": i,
+                "power": p
+            })
+
+        # # Gesamtsummen
+        # total_cfg = sensors.get("total", {})
+        # total_power_entity = total_cfg.get("power")
+        # total_energy_entity = total_cfg.get("energy")
+
+        # total_power_final = get_value(total_power_entity) if total_power_entity else round(total_power, 2)
+        # total_energy = get_value(total_energy_entity) if total_energy_entity else round(total_power / 1000, 3)
+
+
+
+
+
 
         return web.json_response(status)
 

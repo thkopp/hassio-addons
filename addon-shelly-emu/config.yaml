@@ -1,6 +1,6 @@
 name: "Shelly Pro 3EM Emulator"
 description: "Emuliert ein Shelly Pro 3EM mit lokalen Sensorwerten"
-version: "0.0.0.8"
+version: "0.0.0.91"
 url: https://github.com/thkopp/hassio-addons/tree/main/addon-shelly-emu
 slug: "shelly_emulator"
 
@@ -42,27 +42,52 @@ options:
     # triphase: true
     # sliding_average: true
 
+  # sensors:
+  #   total:
+  #     power: "sensor.tibber_pulse_local_0100100700ff"
+  #     energy: "sensor.tibber_pulse_local_0100010800ff_in_k"
+
+  #   phase_l1:
+  #     voltage: "sensor.tibber_pulse_local_0100200700ff"
+  #     current: "sensor.tibber_pulse_local_01001f0700ff"
+  #     phi: "sensor.tibber_pulse_local_0100510704ff"
+  #     power: ""
+
+  #   phase_l2:
+  #     voltage: "sensor.tibber_pulse_local_0100340700ff"
+  #     current: "sensor.tibber_pulse_local_0100330700ff"
+  #     phi: "sensor.tibber_pulse_local_010051070fff"
+  #     power: ""
+
+  #   phase_l3:
+  #     voltage: "sensor.tibber_pulse_local_0100480700ff"
+  #     current: "sensor.tibber_pulse_local_0100470700ff"
+  #     phi: "sensor.tibber_pulse_local_010051071aff"
+  #     power: ""
+
   sensors:
     total:
-      power: "sensor.tibber_pulse_local_0100100700ff"
-      energy: "sensor.tibber_pulse_local_0100010800ff_in_k"
+      power: ""
+      power_from_grid: "sensor.tibber_pulse_loftness_leistung"
+      power_to_grid: "sensor.tibber_pulse_loftness_einspeiseleistung"
+      energy: "sensor.tibber_pulse_loftness_zahlerstand_verbrauch"
 
     phase_l1:
-      voltage: "sensor.tibber_pulse_local_0100200700ff"
-      current: "sensor.tibber_pulse_local_01001f0700ff"
-      phi: "sensor.tibber_pulse_local_0100510704ff"
+      voltage: "sensor.tibber_pulse_loftness_spannung_l1"
+      current: "sensor.tibber_pulse_loftness_stromstarke_l1"
+      phi: ""
       power: ""
 
     phase_l2:
-      voltage: "sensor.tibber_pulse_local_0100340700ff"
-      current: "sensor.tibber_pulse_local_0100330700ff"
-      phi: "sensor.tibber_pulse_local_010051070fff"
+      voltage: "sensor.tibber_pulse_loftness_spannung_l2"
+      current: "sensor.tibber_pulse_loftness_stromstarke_l2"
+      phi: ""
       power: ""
 
     phase_l3:
-      voltage: "sensor.tibber_pulse_local_0100480700ff"
-      current: "sensor.tibber_pulse_local_0100470700ff"
-      phi: "sensor.tibber_pulse_local_010051071aff"
+      voltage: "sensor.tibber_pulse_loftness_spannung_l3"
+      current: "sensor.tibber_pulse_loftness_stromstarke_l3"
+      phi: ""
       power: ""
 
 schema:
@@ -82,6 +107,8 @@ schema:
   sensors:
     total:
       power: str?
+      power_from_grid: str?
+      power_to_grid: str?
       energy: str?
 
     phase_l1:

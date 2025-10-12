@@ -22,28 +22,21 @@ def load_sensors_from_config(config_path=CONFIG_PATH):
     sensors_cfg = config.get("sensors", {})
     log.info(f"  {sensors_cfg}")
 
-    # Standard-Dict-Struktur, falls Schlüssel fehlen
     sensors = {
         "phase_l1": {"voltage": "", "current": "", "phi": "", "power": ""},
         "phase_l2": {"voltage": "", "current": "", "phi": "", "power": ""},
         "phase_l3": {"voltage": "", "current": "", "phi": "", "power": ""},
-        "total": {"power": "", "energy": ""}
+        "total": {"power": "", "power_from_grid": "", "power_to_grid": "", "energy": ""}
     }
 
-    # Update vorhandene Werte
     for key in sensors.keys():
         if key in sensors_cfg:
             sensors[key].update(sensors_cfg[key])
 
-    # Logging
     log.info("✅ Sensoren aus Config geladen:")
-#    for phase, values in sensors.items():
-#        log.info(f"  {phase}: {values}")
-
     return sensors
 
 def flatten_sensor_entities(sensors):
-    """Alle gültigen Entity-IDs in eine flache Liste"""
     entities = []
     for phase in ["phase_l1", "phase_l2", "phase_l3", "total"]:
         entities.extend([v for v in sensors.get(phase, {}).values() if v])
@@ -70,7 +63,7 @@ async def start_servers():
     )
 
     # WS-Client starten
-    asyncio.create_task(ha_ws.connect())
+    ws_task = asyncio.create_task(ha_ws.connect())
     await ha_ws.connected_event.wait()
     log.info(f"✅ Initialwerte von Home Assistant sind geladen, Cache Keys: {list(ha_ws.cache.keys())}")
 
@@ -79,7 +72,6 @@ async def start_servers():
     rpc_app["ha_client"] = ha_ws
     rpc_app["sensors"] = sensors
 
-    # mDNS starten (falls aktiviert)
     asyncio.create_task(api.start_mdns())
 
     # RPC Server starten
@@ -90,7 +82,7 @@ async def start_servers():
     await rpc_site.start()
     log.info(f"✅ Shelly Emulator läuft auf Port {port}")
 
-    # Dashboard starten (Ingress)
+    # Dashboard starten
     WEB_DIR = "/app/web"
     dash_app = web.Application()
     dash_app.router.add_static('/static', WEB_DIR, show_index=True)
@@ -103,9 +95,8 @@ async def start_servers():
     await dash_runner.setup()
     dash_site = web.TCPSite(dash_runner, host="0.0.0.0", port=8080)
     await dash_site.start()
-    log.info(f"✅ Dashboard läuft (Ingress-kompatibel) auf Port 8080")
+    log.info(f"✅ Dashboard läuft auf Port 8080")
 
-    # Endlosschleife
     try:
         while True:
             await asyncio.sleep(3600)
@@ -115,6 +106,7 @@ async def start_servers():
         await ha_ws.close()
         await rpc_runner.cleanup()
         await dash_runner.cleanup()
+        ws_task.cancel()
 
 if __name__ == "__main__":
     asyncio.run(start_servers())
