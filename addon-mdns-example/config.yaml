@@ -1,14 +1,16 @@
-name: "mDNS Test Add-on"
-description: "Ein einfaches Add-on, das einen mDNS/zeroconf Dienst broadcastet."
-version: "0.0.3"
-slug: "mdns_test"
+name: "mDNS Example Addon"
+version: "0.0.4"
+slug: "addon-mdns-example"
+description: "Minimal mDNS test addon"
 arch:
   - amd64
-  - aarch64
   - armv7
 startup: "application"
 boot: "manual"
 host_network: true
+services:
+  - dbus:system
+image: "ghcr.io/thkopp/addon-mdns-example:latest"
 ingress: false
 
 ports:
