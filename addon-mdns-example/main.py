@@ -1,12 +1,24 @@
 #!/usr/bin/env python3
-import os
 import time
-from zeroconf import ServiceInfo, Zeroconf
+import json
 import socket
+from zeroconf import ServiceInfo, Zeroconf
+from pathlib import Path
 
-# Environment-Variablen (Home Assistant Addon)
-DEVICE_NAME = os.environ.get("DEVICE_NAME", "mdns-test-addon")
-PORT = int(os.environ.get("PORT", 8080))
+# Standardwerte
+DEVICE_NAME = "mdns-test-addon"
+PORT = 8080
+
+# Optionen aus HA UI lesen
+options_file = Path("/data/options.json")
+if options_file.exists():
+    try:
+        with open(options_file) as f:
+            options = json.load(f)
+            DEVICE_NAME = options.get("device_name", DEVICE_NAME)
+            PORT = int(options.get("port", PORT))
+    except Exception as e:
+        print(f"⚠️ Fehler beim Lesen von options.json: {e}")
 
 # Lokale IP ermitteln
 def get_local_ip():
@@ -23,7 +35,7 @@ def get_local_ip():
 ip_addr = get_local_ip()
 ip_bytes = socket.inet_aton(ip_addr)
 
-desc = {'info': 'Minimal mDNS Test Addon'}
+desc = {"info": "Minimal mDNS Test Addon"}
 
 info = ServiceInfo(
     "_http._tcp.local.",
@@ -31,7 +43,7 @@ info = ServiceInfo(
     addresses=[ip_bytes],
     port=PORT,
     properties=desc,
-    server=f"{DEVICE_NAME}.local."
+    server=f"{DEVICE_NAME}.local.",
 )
 
 zeroconf = Zeroconf()

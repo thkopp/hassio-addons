@@ -1,31 +1,19 @@
 FROM python:3.12-alpine
 
-# Metadata
-LABEL maintainer="thkopp" \
-      description="Minimal mDNS test addon" \
-      version="0.0.1"
+# Python installieren
+RUN apk add --no-cache python3 py3-pip
 
-# Systempakete + Python pip
-RUN apk add --no-cache \
-        bash \
-        dbus \
-        avahi \
-        avahi-tools \
-        socat \
-        tini \
-        curl \
-        iproute2 \
-        && adduser -D -h /app app
-
+# Arbeitsverzeichnis
 WORKDIR /app
 
+# Python-Abhängigkeiten
 RUN python3 -m pip install zeroconf --root-user-action=ignore
 
-COPY run.sh main.py config.yaml ./
+# Addon-Dateien kopieren
+COPY main.py config.yaml ./
 
-USER app
-
+# Ports
 EXPOSE 8080/tcp 5353/udp
 
-ENTRYPOINT ["/sbin/tini", "-s", "--"]
-CMD ["bash", "run.sh"]
+# Startbefehl
+CMD ["python3", "main.py"]
