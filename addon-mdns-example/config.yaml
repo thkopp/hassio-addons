@@ -15,7 +15,7 @@ services:
 
 image: "ghcr.io/thkopp/addon-mdns-example:latest"
 image_auth:
-  username: !secret "ghcr_user"
+  username: !secret ghcr_user
   password: !secret ghcr_token
 
 ingress: false
