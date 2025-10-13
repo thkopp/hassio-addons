@@ -35,7 +35,7 @@ jobs:
       - name: Extract version from config.yaml
         id: get_version
         run: |
-          VERSION=$(grep '^version:' hassio-addons/addon-mdns-example/config.yaml | awk '{print $2}' | tr -d '"')
+          VERSION=$(grep '^version:' addon-mdns-example/config.yaml | awk '{print $2}' | tr -d '"')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Build and push multi-arch image
