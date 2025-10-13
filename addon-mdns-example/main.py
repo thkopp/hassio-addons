@@ -1,4 +1,3 @@
-import sys
 import asyncio
 import socket
 from zeroconf.asyncio import AsyncZeroconf, AsyncServiceInfo
@@ -7,40 +6,32 @@ import logging
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("mdns_test")
 
-async def main(name, port):
-    azc = AsyncZeroconf()
+async def main():
+    name = "test-mdns-device._http._tcp.local."
+    port = 8080
+    ip = socket.gethostbyname(socket.gethostname())
+    log.info(f"📡 Registering mDNS service {name} on {ip}:{port}")
 
-    # Lokale IP bestimmen
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(("8.8.8.8", 80))
-    ip = s.getsockname()[0]
-    s.close()
-
-    service_type = "_http._tcp.local."
-    service_name = f"{name}.{service_type}"
-    desc = {"info": "mDNS Test Addon via Zeroconf"}
-
+    zc = AsyncZeroconf()
     info = AsyncServiceInfo(
-        service_type,
-        service_name,
-        addresses=[socket.inet_aton(ip)],
+        type_="_http._tcp.local.",
+        name=name,
         port=port,
-        properties=desc,
-        server=f"{name}.local."
+        addresses=[socket.inet_aton(ip)],
+        properties={"version": "1.0"},
     )
-
-    await azc.async_register_service(info)
-    log.info(f"✅ mDNS-Dienst registriert: {service_name} ({ip}:{port})")
+    await zc.async_register_service(info)
 
     try:
+        log.info("✅ mDNS Service running. Press Ctrl+C to stop.")
         while True:
-            await asyncio.sleep(60)
+            await asyncio.sleep(1)
     except KeyboardInterrupt:
-        log.info("🛑 Beende mDNS-Test...")
-        await azc.async_unregister_service(info)
-        await azc.async_close()
+        pass
+    finally:
+        await zc.async_unregister_service(info)
+        await zc.async_close()
+        log.info("🛑 mDNS Service stopped.")
 
 if __name__ == "__main__":
-    name = sys.argv[1] if len(sys.argv) > 1 else "shelly-mdns-test"
-    port = int(sys.argv[2]) if len(sys.argv) > 2 else 8080
-    asyncio.run(main(name, port))
+    asyncio.run(main())
