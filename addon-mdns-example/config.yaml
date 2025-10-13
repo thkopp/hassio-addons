@@ -1,5 +1,5 @@
 name: "mDNS Test Addon"
-version: "0.0.7"
+version: "0.0.8"
 slug: "addon-mdns-example"
 description: "Minimal mDNS test addon"
 arch:
@@ -10,8 +10,8 @@ startup: "application"
 boot: "manual"
 
 host_network: true
-#services:
-#  - dbus:system
+services:
+  - dbus:system
 
 image: ghcr.io/thkopp/addon-mdns-example
 image_auth:
