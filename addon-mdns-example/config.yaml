@@ -1,27 +1,32 @@
-name: "mDNS Example Addon"
-version: "0.0.4"
+name: "mDNS Test Addon"
+version: "0.0.5"
 slug: "addon-mdns-example"
 description: "Minimal mDNS test addon"
 arch:
   - amd64
   - armv7
+
 startup: "application"
 boot: "manual"
-host_network: true
-image: "ghcr.io/thkopp/addon-mdns-example:latest"
-ingress: false
 
+host_network: true
+services:
+  - dbus:system
+
+image: "ghcr.io/thkopp/addon-mdns-example:latest"
+image_auth:
+  username: !secret "ghcr_user"
+  password: !secret ghcr_token
+
+ingress: false
 ports:
   8080/tcp: 8080
   5353/udp: 5353
 
-map:
-  - config:rw
+options:
+  device_name: "mdns-test-addon"
+  port: 8080
 
 schema:
-  mdns_name: str?
-  mdns_port: int?
-
-options:
-  mdns_name: "test-mdns-device"
-  mdns_port: 8080
+  device_name: str?
+  port: int?
