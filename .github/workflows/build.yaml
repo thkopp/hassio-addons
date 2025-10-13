@@ -16,11 +16,8 @@ jobs:
       - name: Show github.workspace
         run: echo "github.workspace = ${{ github.workspace }}"
 
-      - name: Show GITHUB_WORKSPACE
-        run: echo "GITHUB_WORKSPACE = $GITHUB_WORKSPACE"
-
       - name: List root contents
-        run: ls -la $GITHUB_WORKSPACE
+        run: ls -la ${{ github.workspace }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -35,6 +32,12 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GHCR_PAT }}
 
+      - name: Extract version from config.yaml
+        id: get_version
+        run: |
+          VERSION=$(grep '^version:' hassio-addons/addon-mdns-example/config.yaml | awk '{print $2}' | tr -d '"')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Build and push multi-arch image
         uses: docker/build-push-action@v6
         with:
@@ -43,3 +46,4 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/addon-mdns-example:latest
+            ghcr.io/${{ github.repository_owner }}/addon-mdns-example:${{ steps.get_version.outputs.version }}
