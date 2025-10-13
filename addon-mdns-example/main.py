@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-import sys
+import os
 import time
 from zeroconf import ServiceInfo, Zeroconf
 import socket
 
-device_name = sys.argv[1] if len(sys.argv) > 1 else "mdns-test-addon"
-port = int(sys.argv[2]) if len(sys.argv) > 2 else 8080
+# Environment-Variablen (Home Assistant Addon)
+DEVICE_NAME = os.environ.get("DEVICE_NAME", "mdns-test-addon")
+PORT = int(os.environ.get("PORT", 8080))
 
 # Lokale IP ermitteln
 def get_local_ip():
@@ -26,17 +27,17 @@ desc = {'info': 'Minimal mDNS Test Addon'}
 
 info = ServiceInfo(
     "_http._tcp.local.",
-    f"{device_name}._http._tcp.local.",
+    f"{DEVICE_NAME}._http._tcp.local.",
     addresses=[ip_bytes],
-    port=port,
+    port=PORT,
     properties=desc,
-    server=f"{device_name}.local."
+    server=f"{DEVICE_NAME}.local."
 )
 
 zeroconf = Zeroconf()
 try:
     zeroconf.register_service(info)
-    print(f"📡 mDNS Service registered: {device_name} on {ip_addr}:{port}")
+    print(f"📡 mDNS Service registered: {DEVICE_NAME} on {ip_addr}:{PORT}")
     print("⏳ Press Ctrl+C to exit...")
     while True:
         time.sleep(1)

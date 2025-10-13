@@ -1,7 +1,7 @@
 name: "mDNS Test Addon"
-version: "0.0.10"
+version: "0.0.11"
 slug: "addon-mdns-example"
-description: "Minimal mDNS test addon"
+description: "Minimal mDNS Test Addon"
 arch:
   - amd64
   - aarch64

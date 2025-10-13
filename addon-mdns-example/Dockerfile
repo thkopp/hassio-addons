@@ -15,21 +15,17 @@ RUN apk add --no-cache \
         tini \
         curl \
         iproute2 \
-        && python3 -m ensurepip \
-        && python3 -m pip install --upgrade pip \
-        && python3 -m pip install zeroconf \
         && adduser -D -h /app app
 
-# Arbeitsverzeichnis
 WORKDIR /app
-USER app
 
-# Copy Addon Files
+RUN python3 -m pip install zeroconf --root-user-action=ignore
+
 COPY run.sh main.py config.yaml ./
 
-# Expose Ports
+USER app
+
 EXPOSE 8080/tcp 5353/udp
 
-# Entrypoint mit Tini
 ENTRYPOINT ["/sbin/tini", "-s", "--"]
 CMD ["bash", "run.sh"]

@@ -1,8 +1,13 @@
-#!/usr/bin/env bash
-# run.sh
-DEVICE_NAME="${DEVICE_NAME:-mdns-test-addon}"
-PORT="${PORT:-8080}"
+#!/usr/bin/with-contenv bashio
+# Shelly Emulator Start-Skript für mDNS Test Addon
 
-echo "ℹ️ Starte mDNS Service für $DEVICE_NAME auf Port $PORT..."
+set -e
 
-python3 main.py "$DEVICE_NAME" "$PORT"
+bashio::log.info "ℹ️ Starte mDNS Test Addon..."
+
+# Environment-Variablen aus Addon-Konfiguration
+export DEVICE_NAME=$(bashio::config 'device_name')
+export PORT=$(bashio::config 'port')
+
+# Python Skript starten
+python3 /app/main.py
