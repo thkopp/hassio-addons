@@ -14,9 +14,6 @@ services:
   - dbus:system
 
 image: ghcr.io/thkopp/addon-mdns-example
-image_auth:
-  username: ghcr_user
-  password: ghcr_token
 
 ingress: false
 ports:
@@ -24,13 +21,9 @@ ports:
   5353/udp: 5353
 
 options:
-  ghcr_user: "thkopp"
-  ghcr_token: "ghp_xxxxx12345TOKEN"
   device_name: "mdns-test-addon"
   port: 8080
 
 schema:
-  ghcr_user: str
-  ghcr_token: str
   device_name: str?
   port: int?
