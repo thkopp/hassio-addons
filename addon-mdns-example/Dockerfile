@@ -1,7 +1,4 @@
-FROM python:3.12-alpine
-
-# Python installieren
-RUN apk add --no-cache python3 py3-pip
+FROM python:3-alpine
 
 # Arbeitsverzeichnis
 WORKDIR /app
@@ -16,4 +13,4 @@ COPY main.py config.yaml ./
 EXPOSE 8080/tcp 5353/udp
 
 # Startbefehl
-CMD ["python3", "main.py"]
+CMD ["python3", "-u", "main.py"]
