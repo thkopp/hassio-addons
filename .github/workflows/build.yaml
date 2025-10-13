@@ -12,6 +12,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Show github.workspace
+        run: echo "github.workspace = ${{ github.workspace }}
+
+      - name: Show GITHUB_WORKSPACE
+        run: echo "GITHUB_WORKSPACE = $GITHUB_WORKSPACE"
+
+      - name: List root contents
+        run: ls -la $GITHUB_WORKSPACE        
         
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
