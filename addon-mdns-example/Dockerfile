@@ -5,9 +5,6 @@ LABEL maintainer="thkopp" \
       description="Minimal mdns test addon" \
       version="0.0.1"
 
-# Optional: User setzen, Host-Avahi nutzt Root nicht
-USER app
-
 # Systempakete inkl. py3-zeroconf
 RUN apk add --no-cache \
         bash \
@@ -23,10 +20,12 @@ RUN apk add --no-cache \
 
 # Arbeitsverzeichnis
 WORKDIR /app
-USER app
 
 # Copy Addon Files
 COPY run.sh main.py config.yaml ./
+
+# User wechseln
+USER app
 
 # Expose Ports
 EXPOSE 8080/tcp 5353/udp
