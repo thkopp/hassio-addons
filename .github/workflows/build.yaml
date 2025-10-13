@@ -3,7 +3,7 @@ name: Build mDNS Example Addon
 on:
   push:
     paths:
-      - "hassio-addons/addon-mdns-example/**"
+      - "addon-mdns-example/**"
   workflow_dispatch:
 
 jobs:
