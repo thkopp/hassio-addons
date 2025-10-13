@@ -10,16 +10,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - run: echo ls -R ${{ github.workspace }}        
-
-      - name: List files
-        run: ls -R ${{ github.workspace }}        
-        
-      - run: echo ${{ github.workspace }}/hassio-addons/addon-mdns-example)
-        
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Show GITHUB_WORKSPACE
+        run: echo "GITHUB_WORKSPACE = $GITHUB_WORKSPACE"
+
+      - name: List root contents
+        run: ls -R $GITHUB_WORKSPACE
+        
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
