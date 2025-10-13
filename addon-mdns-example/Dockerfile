@@ -30,6 +30,6 @@ COPY run.sh main.py config.yaml ./
 # Expose Ports
 EXPOSE 8080/tcp 5353/udp
 
-# Entrypoint mit Tini als PID 1
+# Entrypoint mit Tini
 ENTRYPOINT ["/sbin/tini", "-s", "--"]
-CMD ["python3", "run.sh"]
+CMD ["bash", "run.sh"]
