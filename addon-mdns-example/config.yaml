@@ -1,5 +1,5 @@
 name: "mDNS Test Addon"
-version: "0.0.9"
+version: "0.0.10"
 slug: "addon-mdns-example"
 description: "Minimal mDNS test addon"
 arch:
