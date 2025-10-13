@@ -4,7 +4,7 @@ slug: "addon-mdns-example"
 description: "Minimal mDNS test addon"
 arch:
   - amd64
-  - armv7
+  - aarch64
 
 startup: "application"
 boot: "manual"

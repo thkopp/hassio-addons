@@ -20,8 +20,8 @@ jobs:
         run: echo "GITHUB_WORKSPACE = $GITHUB_WORKSPACE"
 
       - name: List root contents
-        run: ls -la $GITHUB_WORKSPACE        
-        
+        run: ls -la $GITHUB_WORKSPACE
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -39,7 +39,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ${{ github.workspace }}/addon-mdns-example
-          platforms: linux/amd64,linux/arm/v7
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/addon-mdns-example:latest
