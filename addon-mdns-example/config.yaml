@@ -11,7 +11,7 @@ boot: "manual"
 
 host_network: true
 
-image: ghcr.io/thkopp/addon-mdns-example
+image: "ghcr.io/thkopp/addon-mdns-example:latest"
 
 ingress: false
 ports:
