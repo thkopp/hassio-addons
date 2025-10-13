@@ -1,57 +1,47 @@
 #!/usr/bin/env python3
-"""
-Minimal MDNS Test Addon
-Registriert einen HTTP-Service via Zeroconf
-"""
-
-import asyncio
-import logging
-import socket
+import sys
+import time
 from zeroconf import ServiceInfo, Zeroconf
+import socket
 
-logging.basicConfig(level=logging.INFO)
-log = logging.getLogger("mdns-test")
+device_name = sys.argv[1] if len(sys.argv) > 1 else "mdns-test-addon"
+port = int(sys.argv[2]) if len(sys.argv) > 2 else 8080
 
-SERVICE_TYPE = "_http._tcp.local."
-SERVICE_NAME = "mdns-test-addon._http._tcp.local."
-SERVICE_PORT = 8080
-
+# Lokale IP ermitteln
 def get_local_ip():
-    """Ermittelt die lokale IP des Containers"""
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
         ip = s.getsockname()[0]
-        s.close()
-        return ip
-    except Exception as e:
-        log.warning(f"Fehler beim Ermitteln der IP: {e}")
-        return "127.0.0.1"
-
-async def main():
-    zeroconf = Zeroconf()
-    ip_addr = socket.inet_aton(get_local_ip())
-
-    info = ServiceInfo(
-        type_=SERVICE_TYPE,
-        name=SERVICE_NAME,
-        addresses=[ip_addr],
-        port=SERVICE_PORT,
-        properties={"version": "0.0.1"},
-        server="mdns-test.local."
-    )
-
-    try:
-        zeroconf.register_service(info)
-        log.info(f"📡 mDNS Service registriert: {SERVICE_NAME} ({get_local_ip()}:{SERVICE_PORT})")
-        # keep running
-        while True:
-            await asyncio.sleep(3600)
-    except KeyboardInterrupt:
-        log.info("🛑 Stoppe mDNS Service")
+    except Exception:
+        ip = "127.0.0.1"
     finally:
-        zeroconf.unregister_service(info)
-        zeroconf.close()
+        s.close()
+    return ip
 
-if __name__ == "__main__":
-    asyncio.run(main())
+ip_addr = get_local_ip()
+ip_bytes = socket.inet_aton(ip_addr)
+
+desc = {'info': 'Minimal mDNS Test Addon'}
+
+info = ServiceInfo(
+    "_http._tcp.local.",
+    f"{device_name}._http._tcp.local.",
+    addresses=[ip_bytes],
+    port=port,
+    properties=desc,
+    server=f"{device_name}.local."
+)
+
+zeroconf = Zeroconf()
+try:
+    zeroconf.register_service(info)
+    print(f"📡 mDNS Service registered: {device_name} on {ip_addr}:{port}")
+    print("⏳ Press Ctrl+C to exit...")
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    print("\n🛑 Shutting down mDNS...")
+finally:
+    zeroconf.unregister_service(info)
+    zeroconf.close()
