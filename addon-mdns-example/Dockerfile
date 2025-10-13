@@ -5,6 +5,9 @@ LABEL maintainer="thkopp" \
       description="Minimal mdns test addon" \
       version="0.0.1"
 
+# Optional: User setzen, Host-Avahi nutzt Root nicht
+USER app
+
 # Systempakete inkl. py3-zeroconf
 RUN apk add --no-cache \
         bash \

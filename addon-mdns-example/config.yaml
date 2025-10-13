@@ -1,6 +1,6 @@
 name: "mDNS Test Add-on"
 description: "Ein einfaches Add-on, das einen mDNS/zeroconf Dienst broadcastet."
-version: "1.0.0"
+version: "0.0.3"
 slug: "mdns_test"
 arch:
   - amd64
