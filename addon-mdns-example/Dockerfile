@@ -1,11 +1,33 @@
-ARG BUILD_FROM=ghcr.io/hassio-addons/base:15.0.5
-FROM $BUILD_FROM
+FROM python:3.12-alpine
 
-RUN apk add --no-cache python3 py3-pip && \
-    pip install zeroconf
+# Metadata
+LABEL maintainer="thkopp" \
+      description="Minimal mdns test addon" \
+      version="0.0.1"
 
-COPY run.sh /app/run.sh
-COPY main.py /app/main.py
-RUN chmod +x /app/run.sh
+# Systempakete inkl. py3-zeroconf
+RUN apk add --no-cache \
+        bash \
+        dbus \
+        avahi \
+        avahi-tools \
+        py3-zeroconf \
+        socat \
+        tini \
+        curl \
+        iproute2 \
+        && adduser -D -h /app app
 
-CMD [ "/app/run.sh" ]
+# Arbeitsverzeichnis
+WORKDIR /app
+USER app
+
+# Copy Addon Files
+COPY run.sh main.py config.yaml ./
+
+# Expose Ports
+EXPOSE 8080/tcp 5353/udp
+
+# Entrypoint
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["bash", "run.sh"]
