@@ -10,6 +10,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - run: echo ls -R ${{ github.workspace }}        
+
+      - name: List files
+        run: ls -R ${{ github.workspace }}        
+        
+      - run: echo ${{ github.workspace }}/hassio-addons/addon-mdns-example)
+        
       - name: Checkout repository
         uses: actions/checkout@v4
 
