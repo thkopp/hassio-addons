@@ -10,8 +10,8 @@ startup: "application"
 boot: "manual"
 
 host_network: true
-services:
-  - dbus:system
+#services:
+#  - dbus:system
 
 image: "ghcr.io/thkopp/addon-mdns-example:latest"
 image_auth:
