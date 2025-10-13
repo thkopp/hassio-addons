@@ -1,0 +1,21 @@
+name: "mDNS Test Add-on"
+version: "0.0.1"
+slug: "mdns_test"
+description: "Ein einfaches Test-Add-on, das einen mDNS-Dienst über zeroconf registriert"
+startup: "application"
+init: false
+boot: "manual"
+host_network: true
+
+arch:
+  - amd64
+  - armv7
+  - aarch64
+
+options:
+  service_name: "shelly-mdns-test"
+  port: 8080
+
+schema:
+  service_name: str
+  port: int
