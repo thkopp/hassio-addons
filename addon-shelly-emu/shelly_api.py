@@ -150,7 +150,7 @@ class ShellyEmuAPI:
 
         status = {
             "emeters": emeters,
-            "power_grid": power_from_grid,
+            "power_from_grid": power_from_grid,
             "power_to_grid": power_to_grid,
             "total_power": total_power_final,
             "total_energy": total_energy
