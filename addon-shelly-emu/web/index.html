@@ -74,9 +74,50 @@
   }
 </style>
 
+
+<div class="section">
+  <h2>Leistung Netzbezug</h2>
+  <div class="section-row">
+    <div class="bar-container"><div id="totalBar" class="bar"></div></div>
+    <div class="value-table">
+      <div class="value-row">
+        <div id="powerFromGrid" class="value-cell">0</div>
+        <div class="unit-cell">W</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Leistung Netzeinspeisung</h2>
+  <div class="section-row">
+    <div class="bar-container"><div id="totalBar" class="bar"></div></div>
+    <div class="value-table">
+      <div class="value-row">
+        <div id="powerToGrid" class="value-cell">0</div>
+        <div class="unit-cell">W</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Leistung</h2>
+  <div class="section-row">
+    <div class="bar-container"><div id="totalBar" class="bar"></div></div>
+    <div class="value-table">
+      <div class="value-row">
+        <div id="totalPowerVal" class="value-cell">0</div>
+        <div class="unit-cell">W</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <div class="box total">
   <div class="section">
-    <h2>Energie Zählerstand</h2>
+    <h2>Energie</h2>
     <div class="section-row">
       <div class="bar-container"><div id="totalEnergyBar" class="bar"></div></div>
       <div class="value-table">
@@ -87,19 +128,8 @@
       </div>
     </div>
   </div>
+</div>
 
-  <div class="section">
-    <h2>Leistung Zählerstand</h2>
-    <div class="section-row">
-      <div class="bar-container"><div id="totalBar" class="bar"></div></div>
-      <div class="value-table">
-        <div class="value-row">
-          <div id="totalPowerVal" class="value-cell">0</div>
-          <div class="unit-cell">W</div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- ### comment start ###
   <div class="section">
@@ -115,7 +145,6 @@
     </div>
   </div>
   ### comment end ### -->
-</div>
 
 <div class="container" id="phases"></div>
 
@@ -314,9 +343,13 @@ async function fetchStatus() {
       chart.update('none');
     });
 
+    const powerFromGrid = Math.round(data.power_from_grid);
+    const powertoGrid = Math.round(data.power_to_grid);
     const totalPower = Math.round(data.total_power);
     const totalEnergy = Math.round(data.total_energy);
 
+    document.getElementById('powerFromGridVal').textContent = powerFromGrid;
+    document.getElementById('powertoGrid').textContent = powertoGrid;
     document.getElementById('totalPowerVal').textContent = totalPower;
     document.getElementById('totalEnergyVal').textContent = totalEnergy;
     // document.getElementById('combinedPowerVal').textContent = combinedPower;

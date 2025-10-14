@@ -150,6 +150,8 @@ class ShellyEmuAPI:
 
         status = {
             "emeters": emeters,
+            "power_grid": power_from_grid,
+            "power_to_grid": power_to_grid,
             "total_power": total_power_final,
             "total_energy": total_energy
         }
@@ -185,10 +187,6 @@ class ShellyEmuAPI:
 
         # total_power_final = get_value(total_power_entity) if total_power_entity else round(total_power, 2)
         # total_energy = get_value(total_energy_entity) if total_energy_entity else round(total_power / 1000, 3)
-
-
-
-
 
 
         return web.json_response(status)
