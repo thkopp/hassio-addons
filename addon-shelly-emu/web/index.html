@@ -82,7 +82,7 @@
     <div class="bar-container"><div id="totalBar" class="bar"></div></div>
     <div class="value-table">
       <div class="value-row">
-        <div id="powerFromGrid" class="value-cell">0</div>
+        <div id="powerFromGridVal" class="value-cell">0</div>
         <div class="unit-cell">W</div>
       </div>
     </div>
@@ -95,7 +95,7 @@
     <div class="bar-container"><div id="totalBar" class="bar"></div></div>
     <div class="value-table">
       <div class="value-row">
-        <div id="powerToGrid" class="value-cell">0</div>
+        <div id="powerToGridVal" class="value-cell">0</div>
         <div class="unit-cell">W</div>
       </div>
     </div>
@@ -349,7 +349,7 @@ async function fetchStatus() {
     const totalEnergy = Math.round(data.total_energy);
 
     document.getElementById('powerFromGridVal').textContent = powerFromGrid;
-    document.getElementById('powertoGrid').textContent = powertoGrid;
+    document.getElementById('powerToGridVal').textContent = powertoGrid;
     document.getElementById('totalPowerVal').textContent = totalPower;
     document.getElementById('totalEnergyVal').textContent = totalEnergy;
     // document.getElementById('combinedPowerVal').textContent = combinedPower;
