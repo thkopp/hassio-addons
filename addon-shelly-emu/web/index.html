@@ -162,7 +162,7 @@
 <div class="container" id="phases"></div>
 
 <script>
-const baseUrl = "http://homeassistant.local:1010";
+const baseUrl = "http://localhost:1010";
 const maxDataPoints = 30;
 const phasePowerCharts = [];
 const phasePowerData = [[], [], []];
@@ -183,10 +183,10 @@ function getColor(value, type = 'power') {
     if (value < 5) return 'green';
     if (value < 15) return 'orange';
     return 'red';
-  } else if (type === 'phi') {
+  //else if (type === 'phi') {
     // if (Math.abs(value) < 30) return 'green';
     // if (Math.abs(value) < 90) return 'orange';
-    return 'darkblue';
+  //  return 'darkblue';
   }
   return 'gray';
 }
@@ -287,7 +287,7 @@ async function fetchStatus() {
     data.emeters.forEach((phase, idx) => {
       const v = Math.round(phase.voltage);
       const c = phase.current.toFixed(2);
-      const phi = Math.round(phase.phi);
+      // const phi = Math.round(phase.phi);
       const p = Math.round(phase.power);
       combinedPower += p;
 
@@ -315,7 +315,7 @@ async function fetchStatus() {
       //if (phasePhiData[idx].length > maxDataPoints) phasePhiData[idx].shift();
 
       const powerColor = getColor(p, 'power');
-      const phiColor = getColor(phi, 'phi');
+      // const phiColor = getColor(phi, 'phi');
       const chart = phasePowerCharts[idx];
 
       chart.data.datasets[0].data = phasePowerData[idx];
