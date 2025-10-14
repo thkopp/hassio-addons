@@ -144,7 +144,7 @@ class ShellyEmuAPI:
 
         power_from_grid = get_value(total_power_from_grid_entity) if total_power_from_grid_entity else 0
         power_to_grid = get_value(total_power_to_grid_entity) if total_power_to_grid_entity else 0
-        total_power_final = power_from_grid + power_to_grid
+        total_power_final = power_from_grid - power_to_grid
 
         total_energy = get_value(total_energy_entity) if total_energy_entity else 0
 
@@ -153,7 +153,6 @@ class ShellyEmuAPI:
             "total_power": total_power_final,
             "total_energy": total_energy
         }
-
 
         p_sum = 0
         for phase_key in ["phase_l1", "phase_l2", "phase_l3"]:
