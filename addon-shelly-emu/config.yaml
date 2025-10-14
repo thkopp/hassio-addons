@@ -1,6 +1,6 @@
 name: "Shelly Pro 3EM Emulator"
 description: "Emuliert ein Shelly Pro 3EM mit lokalen Sensorwerten"
-version: "0.0.0.98"
+version: "0.0.0.99"
 url: https://github.com/thkopp/hassio-addons/tree/main/addon-shelly-emu
 slug: "shelly_emulator"
 
@@ -76,19 +76,19 @@ options:
     phase_l1:
       voltage: "sensor.tibber_pulse_loftness_spannung_l1"
       current: "sensor.tibber_pulse_loftness_stromstarke_l1"
-      phi: ""
+      # phi: ""
       power: ""
 
     phase_l2:
       voltage: "sensor.tibber_pulse_loftness_spannung_l2"
       current: "sensor.tibber_pulse_loftness_stromstarke_l2"
-      phi: ""
+      # phi: ""
       power: ""
 
     phase_l3:
       voltage: "sensor.tibber_pulse_loftness_spannung_l3"
       current: "sensor.tibber_pulse_loftness_stromstarke_l3"
-      phi: ""
+      # phi: ""
       power: ""
 
 schema:
@@ -115,17 +115,17 @@ schema:
     phase_l1:
       voltage: str?
       current: str?
-      phi: str?
+      # phi: str?
       power: str?
 
     phase_l2:
       voltage: str?
       current: str?
-      phi: str?
+      # phi: str?
       power: str?
 
     phase_l3:
       voltage: str?
       current: str?
-      phi: str?
+      # phi: str?
       power: str?

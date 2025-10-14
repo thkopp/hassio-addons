@@ -7,14 +7,22 @@
 <style>
   body { font-family: sans-serif; padding: 1rem; background: #f0f0f5; }
   h1 { text-align: center; margin-bottom: 1rem; }
+
   .container { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
   .box { background: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); flex: 1 1 250px; min-width: 250px; }
   .total { flex: 1 1 100%; margin-bottom: 1rem; }
+
   h2 { margin-top: 0; margin-bottom: 0.5rem; font-size: 1rem; }
   table { width: 100%; border-collapse: collapse; margin-bottom: 0.5rem; }
   th, td { padding: 0.3rem 0.5rem; text-align: left; font-size: 0.9rem; }
   td { display: flex; justify-content: space-between; align-items: center; }
+
   .bar-container { height: 12px; background: #ddd; border-radius: 6px; width: 70%; margin-right: 0.5rem; position: relative; }
+  /* Doppelseitiger Balken mit Mittelachse */
+  .bar-container.dual {position: relative; background: linear-gradient(to right, #ddd 50%, #ddd 50%);  overflow: visible;}
+  .bar-container.dual::before {content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: #aaa; z-index: 1;}
+  .bar-container.dual .bar {position: absolute;top: 0; height: 100%;transition: width 0.4s ease, left 0.4s ease, background 0.3s ease; z-index: 0;}
+
   .bar { height: 100%; border-radius: 6px; width: 0%; }
   canvas { width: 100%; height: 120px; }
 
@@ -28,7 +36,6 @@
   .section { margin-bottom: 0.5rem; display:flex; flex-direction:column; }
   .section-row { display:flex; align-items:center; justify-content: space-between; }
 </style>
-<!-- <link href='https://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet' type='text/css'> -->
 </head>
 <body>
 
@@ -72,53 +79,33 @@
     font-weight: bold;
     text-align: left;
   }
+
+  .label-cell {
+    width: 160px;            /* Breite der Beschriftung */
+    text-align: left;
+    font-weight: bold;
+    padding-right: 0.5rem;
+    font-size: 0.9rem;
+    white-space: nowrap;     /* kein Zeilenumbruch */
+  }
+
+  .section-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;              /* etwas Abstand zwischen Label, Balken, Wert */
+  }
+
 </style>
 
 
+
+
 <div class="box total">
-<div class="section">
-  <h2>Leistung Netzbezug</h2>
-  <div class="section-row">
-    <div class="bar-container"><div id="totalBar" class="bar"></div></div>
-    <div class="value-table">
-      <div class="value-row">
-        <div id="powerFromGridVal" class="value-cell">0</div>
-        <div class="unit-cell">W</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="section">
-  <h2>Leistung Netzeinspeisung</h2>
-  <div class="section-row">
-    <div class="bar-container"><div id="totalBar" class="bar"></div></div>
-    <div class="value-table">
-      <div class="value-row">
-        <div id="powerToGridVal" class="value-cell">0</div>
-        <div class="unit-cell">W</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="section">
-  <h2>Leistung</h2>
-  <div class="section-row">
-    <div class="bar-container"><div id="totalBar" class="bar"></div></div>
-    <div class="value-table">
-      <div class="value-row">
-        <div id="totalPowerVal" class="value-cell">0</div>
-        <div class="unit-cell">W</div>
-      </div>
-    </div>
-  </div>
-</div>
-
 
   <div class="section">
-    <h2>Energie</h2>
     <div class="section-row">
+      <div class="label-cell">Zählerstand</div>
       <div class="bar-container"><div id="totalEnergyBar" class="bar"></div></div>
       <div class="value-table">
         <div class="value-row">
@@ -128,28 +115,54 @@
       </div>
     </div>
   </div>
-</div>
 
-
-  <!-- ### comment start ###
   <div class="section">
-    <h2>Leistung summiert</h2>
     <div class="section-row">
-      <div class="bar-container"><div id="combinedBar" class="bar"></div></div>
+      <div class="label-cell">Netzbezug</div>
+      <div class="bar-container"><div id="powerFromGridBar" class="bar"></div></div>
       <div class="value-table">
         <div class="value-row">
-          <div id="combinedPowerVal" class="value-cell">0</div>
+          <div id="powerFromGridVal" class="value-cell">0</div>
           <div class="unit-cell">W</div>
         </div>
       </div>
     </div>
   </div>
-  ### comment end ### -->
+
+  <div class="section">
+    <div class="section-row">
+      <div class="label-cell">Netzeinspeisung</div>
+      <div class="bar-container"><div id="powerToGridBar" class="bar"></div></div>
+      <div class="value-table">
+        <div class="value-row">
+          <div id="powerToGridVal" class="value-cell">0</div>
+          <div class="unit-cell">W</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="section">
+  <div class="section-row">
+    <div class="label-cell">Gesamtleistung</div>
+    <div class="bar-container dual">
+      <div id="totalPowerBar" class="bar"></div>
+    </div>
+    <div class="value-table">
+      <div class="value-row">
+        <div id="totalPowerVal" class="value-cell">0</div>
+        <div class="unit-cell">W</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
 
 <div class="container" id="phases"></div>
 
 <script>
-const baseUrl = "http://192.168.40.5:1010";
+const baseUrl = "http://homeassistant.local:1010";
 const maxDataPoints = 30;
 const phasePowerCharts = [];
 const phasePowerData = [[], [], []];
@@ -178,6 +191,7 @@ function getColor(value, type = 'power') {
   return 'gray';
 }
 
+
 function createPhaseDiv(idx) {
   const div = document.createElement('div');
   div.className = 'box';
@@ -191,32 +205,6 @@ function createPhaseDiv(idx) {
             <span class="number" id="p${idx}">0</span><span class="unit">W</span>
           </div>
         </td>
-      <!-- ### comment start ###
-      <tr><th>U</th>
-        <td>
-          <div class="bar-container"><div id="barV${idx}" class="bar"></div></div>
-          <div class="value-unit">
-            <span class="number" id="v${idx}">0</span><span class="unit">V</span>
-          </div>
-        </td>
-      </tr>
-      <tr><th>I</th>
-        <td>
-          <div class="bar-container"><div id="barC${idx}" class="bar"></div></div>
-          <div class="value-unit">
-            <span class="number" id="c${idx}">0.00</span><span class="unit">A</span>
-          </div>
-        </td>
-      </tr>
-      <tr><th>φ</th>
-        <td>
-          <div class="bar-container"><div id="barPhi${idx}" class="bar"></div></div>
-          <div class="value-unit">
-            <span class="number" id="phi${idx}">0</span><span class="unit">°</span>
-          </div>
-        </td>
-      </tr>
-      ### comment end ### -->
     </table>
     <canvas id="chart${idx}"></canvas>
   `;
@@ -343,25 +331,44 @@ async function fetchStatus() {
       chart.update('none');
     });
 
-    const powerFromGrid = Math.round(data.power_from_grid);
-    const powertoGrid = Math.round(data.power_to_grid);
-    const totalPower = Math.round(data.total_power);
-    const totalEnergy = Math.round(data.total_energy);
+const powerFromGrid = Math.round(data.power_from_grid);
+const powerToGrid = Math.round(data.power_to_grid);
+const totalPower = Math.round(data.total_power);
+const totalEnergy = Math.round(data.total_energy);
 
-    document.getElementById('powerFromGridVal').textContent = powerFromGrid;
-    document.getElementById('powerToGridVal').textContent = powertoGrid;
-    document.getElementById('totalPowerVal').textContent = totalPower;
-    document.getElementById('totalEnergyVal').textContent = totalEnergy;
-    // document.getElementById('combinedPowerVal').textContent = combinedPower;
+document.getElementById('powerFromGridVal').textContent = powerFromGrid;
+document.getElementById('powerToGridVal').textContent = powerToGrid;
+document.getElementById('totalPowerVal').textContent = totalPower;
+document.getElementById('totalEnergyVal').textContent = totalEnergy;
 
-    document.getElementById('totalBar').style.width = Math.min((totalPower / maxTotalPower) * 100, 100) + '%';
-    document.getElementById('totalBar').style.background = getColor(totalPower, 'power');
+// === Korrekte Balken-IDs verwenden ===
+document.getElementById('powerFromGridBar').style.width =
+  Math.min((powerFromGrid / maxTotalPower) * 100, 100) + '%';
+document.getElementById('powerFromGridBar').style.background = getColor(powerFromGrid, 'power');
 
-    // document.getElementById('combinedBar').style.width = Math.min((combinedPower / maxTotalPower) * 100, 100) + '%';
-    // document.getElementById('combinedBar').style.background = getColor(combinedPower, 'power');
+document.getElementById('powerToGridBar').style.width =
+  Math.min((powerToGrid / maxTotalPower) * 100, 100) + '%';
+document.getElementById('powerToGridBar').style.background = getColor(powerToGrid, 'power');
 
-    document.getElementById('totalEnergyBar').style.width = Math.min((totalEnergy / maxTotalEnergy) * 100, 100) + '%';
-    document.getElementById('totalEnergyBar').style.background = 'green';
+document.getElementById('totalEnergyBar').style.width =
+  Math.min((totalEnergy / maxTotalEnergy) * 100, 100) + '%';
+document.getElementById('totalEnergyBar').style.background = 'green';
+
+// === Gesamtleistung mit negativer Anzeige ===
+const totalPowerBar = document.getElementById('totalPowerBar');
+const maxAbsPower = maxTotalPower;
+const powerRatio = Math.min(Math.abs(totalPower) / maxAbsPower, 1) * 50;
+
+if (totalPower >= 0) {
+  totalPowerBar.style.left = '50%';
+  totalPowerBar.style.width = powerRatio + '%';
+  totalPowerBar.style.background = 'green';
+} else {
+  totalPowerBar.style.left = (50 - powerRatio) + '%';
+  totalPowerBar.style.width = powerRatio + '%';
+  totalPowerBar.style.background = 'red';
+}
+
   } catch (err) {
     console.error("Error fetching status:", err);
   }

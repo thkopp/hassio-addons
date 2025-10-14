@@ -6,7 +6,7 @@ from aiohttp import web
 from ha_ws import HomeAssistantWS
 from shelly_api import create_app
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 log = logging.getLogger("main")
 
 CONFIG_PATH = "/data/options.json"
