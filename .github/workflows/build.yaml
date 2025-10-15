@@ -3,9 +3,8 @@ name: Build Home Assistant Addon
 on:
   push:
     paths:
-      - "addon-hello-world/**"
       - "addon-mdns-example/**"
-      - "addon-shelly-emu/**"
+      - "addon-hello-world/**"
   workflow_dispatch:
 
 jobs:
@@ -13,19 +12,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 🧩 Repository vollständig auschecken (mind. 2 Commits)
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
-      # 🔍 Erkenne, welches Addon betroffen ist
+      # 🔍 Robuste Erkennung des geänderten Addons
       - name: Detect changed addon
         id: detect_addon
         run: |
-          # Finde den ersten geänderten Addon-Ordner
-          ADDON_DIR=$(git diff --name-only HEAD~1 HEAD | grep '^addon-' | cut -d/ -f1 | sort -u | head -n1)
+          # Falls kein vorheriger Commit existiert (z. B. erster Commit oder workflow_dispatch)
+          if git rev-parse HEAD~1 >/dev/null 2>&1; then
+            BEFORE=$(git rev-parse HEAD~1)
+          else
+            BEFORE=$(git rev-list --max-parents=0 HEAD)
+          fi
+
+          # Geänderte Dateien ermitteln
+          ADDON_DIR=$(git diff --name-only "$BEFORE" HEAD | grep '^addon-' | cut -d/ -f1 | sort -u | head -n1)
+
           if [ -z "$ADDON_DIR" ]; then
             echo "❌ Kein geändertes Addon gefunden!"
             exit 1
           fi
+
           echo "✅ Addon-Änderung erkannt: $ADDON_DIR"
           echo "addon_dir=$ADDON_DIR" >> $GITHUB_OUTPUT
 
@@ -45,7 +56,6 @@ jobs:
       - name: Install yq
         run: sudo apt-get update && sudo apt-get install -y yq
 
-      # Version aus der erkannten Addon-config.yaml lesen
       - name: Extract version
         id: get_version
         run: |
@@ -58,7 +68,6 @@ jobs:
           echo "✅ Gefundene Version: $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      # Image bauen & pushen
       - name: Build and push image
         uses: docker/build-push-action@v6
         with:
