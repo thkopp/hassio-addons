@@ -1,23 +1,33 @@
-name: Build mDNS Example Addon
+name: Build Home Assistant Addon
 
 on:
   push:
     paths:
+      - "addon-hello-world/**"
       - "addon-mdns-example/**"
+      - "addon-shelly-emu/**"
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Show github.workspace
-        run: echo "github.workspace = ${{ github.workspace }}"
-
-      - name: List root contents
-        run: ls -la ${{ github.workspace }}
+      # 🔍 Erkenne, welches Addon betroffen ist
+      - name: Detect changed addon
+        id: detect_addon
+        run: |
+          # Finde den ersten geänderten Addon-Ordner
+          ADDON_DIR=$(git diff --name-only HEAD~1 HEAD | grep '^addon-' | cut -d/ -f1 | sort -u | head -n1)
+          if [ -z "$ADDON_DIR" ]; then
+            echo "❌ Kein geändertes Addon gefunden!"
+            exit 1
+          fi
+          echo "✅ Addon-Änderung erkannt: $ADDON_DIR"
+          echo "addon_dir=$ADDON_DIR" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -32,18 +42,31 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GHCR_PAT }}
 
-      - name: Extract version from config.yaml
+      - name: Install yq
+        run: sudo apt-get update && sudo apt-get install -y yq
+
+      # Version aus der erkannten Addon-config.yaml lesen
+      - name: Extract version
         id: get_version
         run: |
-          VERSION=$(grep '^version:' addon-mdns-example/config.yaml | awk '{print $2}' | tr -d '"')
+          CONFIG="${{ steps.detect_addon.outputs.addon_dir }}/config.yaml"
+          VERSION=$(yq '.version' "$CONFIG")
+          if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
+            echo "❌ Keine Version in $CONFIG gefunden!"
+            exit 1
+          fi
+          echo "✅ Gefundene Version: $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Build and push multi-arch image
+      # Image bauen & pushen
+      - name: Build and push image
         uses: docker/build-push-action@v6
         with:
-          context: ${{ github.workspace }}/addon-mdns-example
+          context: ${{ github.workspace }}/${{ steps.detect_addon.outputs.addon_dir }}
           platforms: linux/amd64,linux/arm64
           push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
-            ghcr.io/${{ github.repository_owner }}/addon-mdns-example:latest
-            ghcr.io/${{ github.repository_owner }}/addon-mdns-example:${{ steps.get_version.outputs.version }}
+            ghcr.io/${{ github.repository_owner }}/${{ steps.detect_addon.outputs.addon_dir }}:latest
+            ghcr.io/${{ github.repository_owner }}/${{ steps.detect_addon.outputs.addon_dir }}:${{ steps.get_version.outputs.version }}
