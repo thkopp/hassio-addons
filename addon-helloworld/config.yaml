@@ -1,12 +1,12 @@
 name: "Hello world"
 description: "My first real add-on!"
-version: "1.1.18"
+version: "1.1.19"
 slug: "hello_world"
 init: false
 arch:
-  - aarch64
+  - arm64
   - amd64
-image: "ghcr.io/thkopp/addon-mdns-example"
+image: "ghcr.io/thkopp/addon-helloworld"
 startup: services
 ports:
   8000/tcp: 8000
