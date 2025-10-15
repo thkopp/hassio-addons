@@ -60,7 +60,7 @@ jobs:
         id: get_version
         run: |
           CONFIG="${{ steps.detect_addon.outputs.addon_dir }}/config.yaml"
-          VERSION=$(yq '.version' "$CONFIG")
+          VERSION=$(yq -r '.version' "$CONFIG" | tr -d '"')
           if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
             echo "❌ Keine Version in $CONFIG gefunden!"
             exit 1
