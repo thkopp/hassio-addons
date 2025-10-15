@@ -41,8 +41,12 @@ jobs:
           password: ${{ secrets.GHCR_PAT }}
 
       # 4️⃣ Installiere yq
-      - name: Install yq
-        run: sudo apt-get update && sudo apt-get install -y yq
+      - name: Install yq (binary, blitzschnell)
+        run: |
+          YQ_VERSION=v4.45.1
+          wget https://github.com/mikefarah/yq/releases/download/$YQ_VERSION/yq_linux_amd64 -O /usr/local/bin/yq
+          chmod +x /usr/local/bin/yq
+          yq --version
 
       # 5️⃣ Detect changed addon (robust)
       - name: Detect changed addon
