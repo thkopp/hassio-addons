@@ -109,8 +109,8 @@ jobs:
 
           for PLATFORM in $PLATFORMS; do
             case "$PLATFORM" in
-              linux/amd64) BUILD_FROM="ghcr.io/home-assistant/amd64-base:3.18" ;;
-              linux/arm64) BUILD_FROM="ghcr.io/home-assistant/arm64v8-base:3.18" ;;
+              linux/amd64) BUILD_FROM="ghcr.io/home-assistant/amd64-base" ;;
+              linux/arm64) BUILD_FROM="ghcr.io/home-assistant/aarch64-base" ;;
               *) echo "❌ Unbekannte Plattform $PLATFORM"; exit 1 ;;
             esac
 
