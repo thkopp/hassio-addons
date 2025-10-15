@@ -25,47 +25,42 @@ jobs:
         id: set_addons
         run: |
           if [ -n "${{ github.event.inputs.addon }}" ]; then
-            ADDONS="[\"${{ github.event.inputs.addon }}\"]"
+            ADDONS_RAW="[\"${{ github.event.inputs.addon }}\"]"
           else
-            # Vorherigen Commit ermitteln
             if git rev-parse HEAD~1 >/dev/null 2>&1; then
               BEFORE=$(git rev-parse HEAD~1)
             else
               BEFORE=$(git rev-list --max-parents=0 HEAD)
             fi
-
-            # Alle geänderten Addons im Root-Verzeichnis
-            ADDONS=$(git diff --name-only "$BEFORE" HEAD \
+            ADDONS_RAW=$(git diff --name-only "$BEFORE" HEAD \
               | grep '^addon-' \
               | cut -d/ -f1 \
               | sort -u \
               | jq -R -s -c 'split("\n")[:-1]')
           fi
 
-          if [ "$ADDONS" = "[]" ]; then
+          if [ "$ADDONS_RAW" = "[]" ]; then
             echo "⚠️ Kein geändertes Addon gefunden."
             exit 0
           fi
 
-          echo "✅ Gefundene Addons: $ADDONS"
-          echo "addons=$ADDONS" >> $GITHUB_OUTPUT
+          # In Objekte für Matrix umwandeln
+          ADDONS_OBJ=$(echo "$ADDONS_RAW" | jq '[.[] | {addon: .}]')
+          echo "✅ Gefundene Addons: $ADDONS_OBJ"
+          echo "addons=$ADDONS_OBJ" >> $GITHUB_OUTPUT
 
   build:
     needs: detect-addons
-    if: needs.detect-addons.outputs.addons != '' # Build nur, wenn Addons existieren
+    if: needs.detect-addons.outputs.addons != '' # Nur ausführen, wenn Addons existieren
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include: ${{ fromJSON(needs.detect-addons.outputs.addons) }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set platform matrix
-        id: platforms
-        run: |
-          echo "PLATFORMS=linux/amd64 linux/arm64" >> $GITHUB_ENV
 
       - name: Install yq (blitzschnell)
         run: |
@@ -73,9 +68,12 @@ jobs:
           chmod +x /usr/local/bin/yq
           yq --version
 
+      - name: Set platform list
+        run: echo "PLATFORMS=linux/amd64 linux/arm64" >> $GITHUB_ENV
+
       - name: Build Addon for all platforms
         run: |
-          ADDON="${{ matrix.include }}"
+          ADDON="${{ matrix.addon }}"
           CONFIG="$GITHUB_WORKSPACE/$ADDON/config.yaml"
 
           if [ ! -f "$CONFIG" ]; then
