@@ -32,6 +32,7 @@ jobs:
             else
               BEFORE=$(git rev-list --max-parents=0 HEAD)
             fi
+
             ADDONS_RAW=$(git diff --name-only "$BEFORE" HEAD \
               | grep '^addon-' \
               | cut -d/ -f1 \
@@ -44,18 +45,14 @@ jobs:
             exit 0
           fi
 
-          # In Objekte für Matrix umwandeln
-          ADDONS_OBJ=$(echo "$ADDONS_RAW" | jq -c '[.[] | {addon: .}]')
-
-          # JSON escapen, damit GitHub Actions es als Output akzeptiert
-          ADDONS_ESCAPED=$(echo "$ADDONS_OBJ" | jq -Rr @json)
-
-          echo "✅ Gefundene Addons: $ADDONS_ESCAPED"
-          echo "addons=$ADDONS_ESCAPED" >> $GITHUB_OUTPUT
+          # In Objekte für Matrix umwandeln (kein Escaping!)
+          ADDONS_OBJ=$(echo "$ADDONS_RAW" | jq '[.[] | {addon: .}]')
+          echo "✅ Gefundene Addons: $ADDONS_OBJ"
+          echo "addons=$ADDONS_OBJ" >> $GITHUB_OUTPUT
 
   build:
     needs: detect-addons
-    if: needs.detect-addons.outputs.addons != '' # Nur ausführen, wenn Addons existieren
+    if: needs.detect-addons.outputs.addons != '' # Job nur ausführen, wenn Addons existieren
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -66,7 +63,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install yq (blitzschnell)
+      - name: Install yq
         run: |
           wget -q https://github.com/mikefarah/yq/releases/download/v4.45.1/yq_linux_amd64 -O /usr/local/bin/yq
           chmod +x /usr/local/bin/yq
