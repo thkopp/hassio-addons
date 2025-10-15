@@ -101,8 +101,8 @@ jobs:
 
           for PLATFORM in $PLATFORMS; do
             case "$PLATFORM" in
-              linux/amd64) BUILD_FROM="ghcr.io/home-assistant/amd64-base:latest" ;;
-              linux/arm64) BUILD_FROM="ghcr.io/home-assistant/aarch64-base:latest" ;;
+              linux/amd64) BUILD_FROM="ghcr.io/home-assistant/amd64-base" ;;
+              linux/arm64) BUILD_FROM="ghcr.io/home-assistant/aarch64-base" ;;
             esac
 
             echo "🔨 Building $ADDON for $PLATFORM..."
