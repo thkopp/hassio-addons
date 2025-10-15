@@ -44,13 +44,25 @@ jobs:
       - name: Extract version
         id: get_version
         run: |
-          CONFIG="${{ matrix.addon }}/config.yaml"
+          ADDON_DIR="${{ steps.detect_addon.outputs.addon_dir }}"
+          CONFIG="${{ github.workspace }}/$ADDON_DIR/config.yaml"
+
+          # Prüfen, ob die Datei existiert
+          if [ ! -f "$CONFIG" ]; then
+            echo "❌ config.yaml für Addon '$ADDON_DIR' nicht gefunden unter '$CONFIG'!"
+            exit 1
+          fi
+
+          # Version auslesen (robust, entfernt Anführungszeichen)
           VERSION=$(yq -r '.version' "$CONFIG" | tr -d '"')
+
+          # Prüfen, ob Version gesetzt ist
           if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
             echo "❌ Keine Version in $CONFIG gefunden!"
             exit 1
           fi
-          echo "✅ Gefundene Version: $VERSION"
+
+          echo "✅ Gefundene Version für '$ADDON_DIR': $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       # 6️⃣ Basis-Image wählen (archabhängig, Patch für HA)
