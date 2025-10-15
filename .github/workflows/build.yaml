@@ -24,9 +24,11 @@ jobs:
       - name: Detect changed addons
         id: set_addons
         run: |
+          # Optionales manuelles Addon
           if [ -n "${{ github.event.inputs.addon }}" ]; then
             ADDONS_RAW="[\"${{ github.event.inputs.addon }}\"]"
           else
+            # Vorherigen Commit ermitteln
             if git rev-parse HEAD~1 >/dev/null 2>&1; then
               BEFORE=$(git rev-parse HEAD~1)
             else
@@ -45,14 +47,15 @@ jobs:
             exit 0
           fi
 
-          # In Objekte für Matrix umwandeln (kein Escaping!)
-          ADDONS_OBJ=$(echo "$ADDONS_RAW" | jq '[.[] | {addon: .}]')
+          # In kompakte JSON-Objekte für Matrix umwandeln
+          ADDONS_OBJ=$(echo "$ADDONS_RAW" | jq -c '[.[] | {addon: .}]')
+
           echo "✅ Gefundene Addons: $ADDONS_OBJ"
           echo "addons=$ADDONS_OBJ" >> $GITHUB_OUTPUT
 
   build:
     needs: detect-addons
-    if: needs.detect-addons.outputs.addons != '' # Job nur ausführen, wenn Addons existieren
+    if: needs.detect-addons.outputs.addons != '' # Job nur, wenn Addons existieren
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
