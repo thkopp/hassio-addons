@@ -5,17 +5,21 @@ on:
     paths:
       - "addon-*/**"
   workflow_dispatch:
+    inputs:
+      addon:
+        description: "Addon-Ordner zum Bauen (optional)"
+        required: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        addon: [addon-mdns-example, addon-hello-world] # oder dynamisch via Detect-Step
+        addon: [addon-mdns-example, addon-hello-world] # Optional: kann durch Detect ersetzt werden
         platform: [linux/amd64, linux/arm64]
 
     steps:
-      # 1️⃣ Repository auschecken mit mindestens 2 Commits
+      # 1️⃣ Repository auschecken
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -36,27 +40,58 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GHCR_PAT }}
 
-      # 4️⃣ Installiere yq (für Version Parsing)
+      # 4️⃣ Installiere yq
       - name: Install yq
         run: sudo apt-get update && sudo apt-get install -y yq
 
-      # 5️⃣ Version aus config.yaml auslesen (robust, ohne Anführungszeichen)
+      # 5️⃣ Detect changed addon (robust)
+      - name: Detect changed addon
+        id: detect_addon
+        run: |
+          # Manuelle Eingabe über workflow_dispatch
+          if [ -n "${{ github.event.inputs.addon }}" ]; then
+            ADDON_DIR="${{ github.event.inputs.addon }}"
+            echo "✅ Addon manuell angegeben: $ADDON_DIR"
+          else
+            # Vorherigen Commit ermitteln
+            if git rev-parse HEAD~1 >/dev/null 2>&1; then
+              BEFORE=$(git rev-parse HEAD~1)
+            else
+              BEFORE=$(git rev-list --max-parents=0 HEAD)
+            fi
+
+            # Geänderte Addons finden
+            ADDON_DIR=$(git diff --name-only "$BEFORE" HEAD \
+              | grep '^addon-' \
+              | cut -d/ -f1 \
+              | sort -u \
+              | head -n1)
+          fi
+
+          if [ -z "$ADDON_DIR" ]; then
+            echo "⚠️ Kein geändertes Addon gefunden, Workflow wird übersprungen"
+            echo "addon_dir=" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "✅ Addon-Änderung erkannt: $ADDON_DIR"
+          echo "addon_dir=$ADDON_DIR" >> $GITHUB_OUTPUT
+
+      # 6️⃣ Extract version
       - name: Extract version
         id: get_version
+        if: steps.detect_addon.outputs.addon_dir != ''
         run: |
           ADDON_DIR="${{ steps.detect_addon.outputs.addon_dir }}"
           CONFIG="${{ github.workspace }}/$ADDON_DIR/config.yaml"
 
-          # Prüfen, ob die Datei existiert
           if [ ! -f "$CONFIG" ]; then
             echo "❌ config.yaml für Addon '$ADDON_DIR' nicht gefunden unter '$CONFIG'!"
             exit 1
           fi
 
-          # Version auslesen (robust, entfernt Anführungszeichen)
           VERSION=$(yq -r '.version' "$CONFIG" | tr -d '"')
 
-          # Prüfen, ob Version gesetzt ist
           if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
             echo "❌ Keine Version in $CONFIG gefunden!"
             exit 1
@@ -65,9 +100,10 @@ jobs:
           echo "✅ Gefundene Version für '$ADDON_DIR': $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      # 6️⃣ Basis-Image wählen (archabhängig, Patch für HA)
+      # 7️⃣ Set BUILD_FROM basierend auf Plattform
       - name: Set BUILD_FROM
         id: build_from
+        if: steps.detect_addon.outputs.addon_dir != ''
         run: |
           case "${{ matrix.platform }}" in
             linux/amd64) BUILD_FROM="ghcr.io/home-assistant/amd64-base:3.18" ;;
@@ -75,13 +111,14 @@ jobs:
             *) echo "❌ Unknown platform"; exit 1 ;;
           esac
           echo "build_from=$BUILD_FROM" >> $GITHUB_OUTPUT
-          echo "✅ BUILD_FROM=${BUILD_FROM}"
+          echo "✅ BUILD_FROM=$BUILD_FROM"
 
-      # 7️⃣ Docker Build & Push (robust, Multi-Arch per Matrix)
+      # 8️⃣ Build & push Docker image
       - name: Build and push Docker image
+        if: steps.detect_addon.outputs.addon_dir != ''
         uses: docker/build-push-action@v6
         with:
-          context: ${{ github.workspace }}/${{ matrix.addon }}
+          context: ${{ github.workspace }}/${{ steps.detect_addon.outputs.addon_dir }}
           platforms: ${{ matrix.platform }}
           push: true
           build-args: |
@@ -89,5 +126,5 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: |
-            ghcr.io/${{ github.repository_owner }}/${{ matrix.addon }}:latest
-            ghcr.io/${{ github.repository_owner }}/${{ matrix.addon }}:${{ steps.get_version.outputs.version }}
+            ghcr.io/${{ github.repository_owner }}/${{ steps.detect_addon.outputs.addon_dir }}:latest
+            ghcr.io/${{ github.repository_owner }}/${{ steps.detect_addon.outputs.addon_dir }}:${{ steps.get_version.outputs.version }}
