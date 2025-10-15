@@ -27,11 +27,14 @@ jobs:
           if [ -n "${{ github.event.inputs.addon }}" ]; then
             ADDONS="[\"${{ github.event.inputs.addon }}\"]"
           else
+            # Vorherigen Commit ermitteln
             if git rev-parse HEAD~1 >/dev/null 2>&1; then
               BEFORE=$(git rev-parse HEAD~1)
             else
               BEFORE=$(git rev-list --max-parents=0 HEAD)
             fi
+
+            # Alle geänderten Addons im Root-Verzeichnis
             ADDONS=$(git diff --name-only "$BEFORE" HEAD \
               | grep '^addon-' \
               | cut -d/ -f1 \
@@ -41,35 +44,40 @@ jobs:
 
           if [ "$ADDONS" = "[]" ]; then
             echo "⚠️ Kein geändertes Addon gefunden."
-            ADDONS="[]"
-          else
-            echo "✅ Gefundene Addons: $ADDONS"
+            exit 0
           fi
 
+          echo "✅ Gefundene Addons: $ADDONS"
           echo "addons=$ADDONS" >> $GITHUB_OUTPUT
 
   build:
     needs: detect-addons
+    if: needs.detect-addons.outputs.addons != '' # Build nur, wenn Addons existieren
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        addon-platform: ${{ fromJSON(needs.detect-addons.outputs.addons) }}
+        include: ${{ fromJSON(needs.detect-addons.outputs.addons) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Loop über alle Plattformen für jedes Addon
-      - name: Build addon for platforms
+      - name: Set platform matrix
+        id: platforms
         run: |
-          ADDON="${{ matrix.addon-platform }}"
-          PLATFORMS="linux/amd64 linux/arm64"
+          echo "PLATFORMS=linux/amd64 linux/arm64" >> $GITHUB_ENV
 
-          # Blitzschnell yq installieren
+      - name: Install yq (blitzschnell)
+        run: |
           wget -q https://github.com/mikefarah/yq/releases/download/v4.45.1/yq_linux_amd64 -O /usr/local/bin/yq
           chmod +x /usr/local/bin/yq
+          yq --version
 
+      - name: Build Addon for all platforms
+        run: |
+          ADDON="${{ matrix.include }}"
           CONFIG="$GITHUB_WORKSPACE/$ADDON/config.yaml"
+
           if [ ! -f "$CONFIG" ]; then
             echo "❌ config.yaml für Addon '$ADDON' nicht gefunden!"
             exit 1
@@ -88,6 +96,7 @@ jobs:
               linux/arm64) BUILD_FROM="ghcr.io/home-assistant/arm64-base:3.18" ;;
             esac
 
+            echo "🔨 Building $ADDON for $PLATFORM..."
             docker buildx build \
               --platform $PLATFORM \
               --build-arg BUILD_FROM=$BUILD_FROM \
