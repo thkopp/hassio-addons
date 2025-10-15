@@ -1,15 +1,13 @@
 name: "Shelly Pro 3EM Emulator"
 description: "Emuliert ein Shelly Pro 3EM mit lokalen Sensorwerten"
-version: "0.0.1.0"
+version: "0.0.1.1"
 url: https://github.com/thkopp/hassio-addons/tree/main/addon-shelly-emu
 slug: "shelly_emulator"
-
 init: false
-
 arch:
-  - amd64
-  - armv7
   - aarch64
+  - amd64
+image: "ghcr.io/thkopp/addon-shelly-emu"
 
 boot: "manual"
 startup: "application"
