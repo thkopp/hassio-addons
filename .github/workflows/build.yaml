@@ -45,9 +45,13 @@ jobs:
           fi
 
           # In Objekte für Matrix umwandeln
-          ADDONS_OBJ=$(echo "$ADDONS_RAW" | jq '[.[] | {addon: .}]')
-          echo "✅ Gefundene Addons: $ADDONS_OBJ"
-          echo "addons=$ADDONS_OBJ" >> $GITHUB_OUTPUT
+          ADDONS_OBJ=$(echo "$ADDONS_RAW" | jq -c '[.[] | {addon: .}]')
+
+          # JSON escapen, damit GitHub Actions es als Output akzeptiert
+          ADDONS_ESCAPED=$(echo "$ADDONS_OBJ" | jq -Rr @json)
+
+          echo "✅ Gefundene Addons: $ADDONS_ESCAPED"
+          echo "addons=$ADDONS_ESCAPED" >> $GITHUB_OUTPUT
 
   build:
     needs: detect-addons
