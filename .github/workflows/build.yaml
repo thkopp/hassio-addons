@@ -13,14 +13,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Matrix wird später dynamisch gesetzt
     strategy:
       fail-fast: false
       matrix:
         platform: [linux/amd64, linux/arm64]
-        addon: [placeholder] # Wird durch Detect ersetzt
+        addon: []
 
     steps:
-      # 1️⃣ Repository auschecken
+      # 1️⃣ Checkout
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -60,12 +61,12 @@ jobs:
           echo "addons=$ADDONS" >> $GITHUB_OUTPUT
 
       # 3️⃣ Set dynamic matrix
-      - name: Set matrix
+      - name: Set dynamic matrix
         id: matrix
         run: |
-          echo "matrix=$(jq -n --argjson addons '${{ steps.detect_addons.outputs.addons }}' \
-            '{addon: $addons, platform: ["linux/amd64","linux/arm64"]}')"
-          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+          MATRIX=$(jq -n --argjson addons '${{ steps.detect_addons.outputs.addons }}' \
+            '{platform: ["linux/amd64","linux/arm64"], addon: $addons}')
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
 
       # 4️⃣ Setup QEMU & Buildx
       - name: Set up QEMU
@@ -82,7 +83,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GHCR_PAT }}
 
-      # 6️⃣ Install yq blitzschnell
+      # 6️⃣ Blitzschnell yq installieren
       - name: Install yq (binary)
         run: |
           YQ_VERSION=v4.45.1
