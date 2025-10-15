@@ -1,10 +1,10 @@
 name: "Hello world"
 description: "My first real add-on!"
-version: "1.1.19"
+version: "1.1.20"
 slug: "hello_world"
 init: false
 arch:
-  - arm64
+  - aarch64
   - amd64
 image: "ghcr.io/thkopp/addon-helloworld"
 startup: services
