@@ -22,10 +22,16 @@ def load_sensors_from_config(config_path=CONFIG_PATH):
     sensors_cfg = config.get("sensors", {})
     log.info(f"  {sensors_cfg}")
 
+    # sensors = {
+    #     "phase_l1": {"voltage": "", "current": "", "phi": "", "power": ""},
+    #     "phase_l2": {"voltage": "", "current": "", "phi": "", "power": ""},
+    #     "phase_l3": {"voltage": "", "current": "", "phi": "", "power": ""},
+    #     "total": {"power": "", "power_from_grid": "", "power_to_grid": "", "energy": ""}
+    # }
     sensors = {
-        "phase_l1": {"voltage": "", "current": "", "phi": "", "power": ""},
-        "phase_l2": {"voltage": "", "current": "", "phi": "", "power": ""},
-        "phase_l3": {"voltage": "", "current": "", "phi": "", "power": ""},
+        "phase_l1": {"voltage": "", "current": "", "power": ""},
+        "phase_l2": {"voltage": "", "current": "", "power": ""},
+        "phase_l3": {"voltage": "", "current": "", "power": ""},
         "total": {"power": "", "power_from_grid": "", "power_to_grid": "", "energy": ""}
     }
 

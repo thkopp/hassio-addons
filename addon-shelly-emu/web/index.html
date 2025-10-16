@@ -160,6 +160,18 @@
 </div>
 
 <div class="container" id="phases"></div>
+<pre id="rpcOutput" style="
+  background:#1e1e1e;
+  color:#00ff88;
+  padding:1rem;
+  border-radius:8px;
+  overflow:auto;
+  max-height:300px;
+  font-family: monospace;
+  font-size: 0.8rem;
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+"></pre>
+
 
 <script>
 const baseUrl = "http://homeassistant.local:1010";
@@ -331,43 +343,55 @@ async function fetchStatus() {
       chart.update('none');
     });
 
-const powerFromGrid = Math.round(data.power_from_grid);
-const powerToGrid = Math.round(data.power_to_grid);
-const totalPower = Math.round(data.total_power);
-const totalEnergy = Math.round(data.total_energy);
+    const powerFromGrid = Math.round(data.power_from_grid);
+    const powerToGrid = Math.round(data.power_to_grid);
+    const totalPower = Math.round(data.total_power);
+    const totalEnergy = Math.round(data.total_energy);
 
-document.getElementById('powerFromGridVal').textContent = powerFromGrid;
-document.getElementById('powerToGridVal').textContent = powerToGrid;
-document.getElementById('totalPowerVal').textContent = totalPower;
-document.getElementById('totalEnergyVal').textContent = totalEnergy;
+    document.getElementById('powerFromGridVal').textContent = powerFromGrid;
+    document.getElementById('powerToGridVal').textContent = powerToGrid;
+    document.getElementById('totalPowerVal').textContent = totalPower;
+    document.getElementById('totalEnergyVal').textContent = totalEnergy;
 
-// === Korrekte Balken-IDs verwenden ===
-document.getElementById('powerFromGridBar').style.width =
-  Math.min((powerFromGrid / maxTotalPower) * 100, 100) + '%';
-document.getElementById('powerFromGridBar').style.background = getColor(powerFromGrid, 'power');
+    // === Korrekte Balken-IDs verwenden ===
+    document.getElementById('powerFromGridBar').style.width =
+      Math.min((powerFromGrid / maxTotalPower) * 100, 100) + '%';
+    document.getElementById('powerFromGridBar').style.background = getColor(powerFromGrid, 'power');
 
-document.getElementById('powerToGridBar').style.width =
-  Math.min((powerToGrid / maxTotalPower) * 100, 100) + '%';
-document.getElementById('powerToGridBar').style.background = getColor(powerToGrid, 'power');
+    document.getElementById('powerToGridBar').style.width =
+      Math.min((powerToGrid / maxTotalPower) * 100, 100) + '%';
+    document.getElementById('powerToGridBar').style.background = getColor(powerToGrid, 'power');
 
-document.getElementById('totalEnergyBar').style.width =
-  Math.min((totalEnergy / maxTotalEnergy) * 100, 100) + '%';
-document.getElementById('totalEnergyBar').style.background = 'green';
+    document.getElementById('totalEnergyBar').style.width =
+      Math.min((totalEnergy / maxTotalEnergy) * 100, 100) + '%';
+    document.getElementById('totalEnergyBar').style.background = 'green';
 
-// === Gesamtleistung mit negativer Anzeige ===
-const totalPowerBar = document.getElementById('totalPowerBar');
-const maxAbsPower = maxTotalPower;
-const powerRatio = Math.min(Math.abs(totalPower) / maxAbsPower, 1) * 50;
+    // === Gesamtleistung mit negativer Anzeige ===
+    const totalPowerBar = document.getElementById('totalPowerBar');
+    const maxAbsPower = maxTotalPower;
+    const powerRatio = Math.min(Math.abs(totalPower) / maxAbsPower, 1) * 50;
 
-if (totalPower >= 0) {
-  totalPowerBar.style.left = '50%';
-  totalPowerBar.style.width = powerRatio + '%';
-  totalPowerBar.style.background = 'green';
-} else {
-  totalPowerBar.style.left = (50 - powerRatio) + '%';
-  totalPowerBar.style.width = powerRatio + '%';
-  totalPowerBar.style.background = 'red';
+    if (totalPower >= 0) {
+      totalPowerBar.style.left = '50%';
+      totalPowerBar.style.width = powerRatio + '%';
+      totalPowerBar.style.background = 'green';
+    } else {
+      totalPowerBar.style.left = (50 - powerRatio) + '%';
+      totalPowerBar.style.width = powerRatio + '%';
+      totalPowerBar.style.background = 'red';
+    }
+
+// --- JSON schön komprimiert anzeigen (emeters kompakt) ---
+let displayJson = structuredClone(data);
+
+// emeters kompakt darstellen
+if (displayJson.emeters) {
+  displayJson.emeters = displayJson.emeters.map(e =>`{power: ${Math.round(e.power).toString().padStart(5, ' ')}, voltage: ${e.voltage.toFixed(1).toString().padStart(5, ' ')}, current: ${e.current.toFixed(2).toString().padStart(5, ' ')}}`);
 }
+
+// Stringify ohne zusätzliche Einrückung
+document.getElementById('rpcOutput').textContent = JSON.stringify(displayJson, null, 2)
+  .replace(/"({ power:[^}]+ })"/g, '$1'); // Anführungszeichen bei den Objekten entfernen
 
   } catch (err) {
     console.error("Error fetching status:", err);
