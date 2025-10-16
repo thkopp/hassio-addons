@@ -1,12 +1,13 @@
-FROM python:3-alpine
+ARG BUILD_FROM
+FROM $BUILD_FROM
 
 
 WORKDIR /app
 
 # Installiere Python + benötigte Pakete nur mit apk (kein pip nötig!)
 RUN apk add --no-cache \
-#    python3 \
-#    py3-pip \
+    python3 \
+    py3-pip \
     py3-aiohttp \
     py3-websockets \
     py3-zeroconf
