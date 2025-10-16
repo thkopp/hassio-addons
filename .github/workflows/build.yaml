@@ -94,24 +94,33 @@ jobs:
         run: |
           ADDON="${{ matrix.addon }}"
           CONFIG="$GITHUB_WORKSPACE/$ADDON/config.yaml"
-
-          if [ ! -f "$CONFIG" ]; then
-            echo "❌ config.yaml für Addon '$ADDON' nicht gefunden!"
-            exit 1
-          fi
-
-          VERSION=$(yq -r '.version' "$CONFIG" | tr -d '"')
-          if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
-            echo "❌ Keine Version in $CONFIG gefunden!"
-            exit 1
-          fi
-          echo "✅ Addon: $ADDON Version: $VERSION"
-
-          docker buildx build \
-            --platform linux/amd64,linux/arm64 \
-            -t ghcr.io/${GITHUB_REPOSITORY_OWNER}/$ADDON:latest \
-            -t ghcr.io/${GITHUB_REPOSITORY_OWNER}/$ADDON:$VERSION \
-            $GITHUB_WORKSPACE/$ADDON \
-            --push
+          
+          # Version auslesen
+          VERSION=$(yq -r '.version' "$CONFIG")
+          
+          for PLATFORM in $PLATFORMS; do
+            case "$PLATFORM" in
+              linux/amd64)
+                BUILD_FROM=$(yq -r '.build_from.amd64' "$CONFIG")
+                ;;
+              linux/arm64)
+                BUILD_FROM=$(yq -r '.build_from.arm64' "$CONFIG")
+                ;;
+              *)
+                echo "❌ Unbekannte Plattform $PLATFORM"
+                exit 1
+                ;;
+            esac
+          
+            IMAGE=$(yq -r '.image' "$CONFIG")
+          
+            echo "🔨 Building $ADDON for $PLATFORM using $BUILD_FROM -> $IMAGE:$VERSION"
             
+            docker buildx build \
+              --platform $PLATFORM \
+              --build-arg BUILD_FROM=$BUILD_FROM \
+              -t $IMAGE:latest \
+              -t $IMAGE:$VERSION \
+              $GITHUB_WORKSPACE/$ADDON \
+              --push
           done
