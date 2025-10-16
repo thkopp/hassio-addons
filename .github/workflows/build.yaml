@@ -92,6 +92,7 @@ jobs:
 
       - name: Build Addon for all platforms
         run: |
+          echo "BUILD_FROM=$BUILD_FROM"
           ADDON="${{ matrix.addon }}"
           CONFIG="$GITHUB_WORKSPACE/$ADDON/config.yaml"
           
@@ -115,7 +116,15 @@ jobs:
             IMAGE=$(yq -r '.image' "$CONFIG")
           
             echo "🔨 Building $ADDON for $PLATFORM using $BUILD_FROM -> $IMAGE:$VERSION"
-            
+
+            echo docker buildx build \
+              --platform $PLATFORM \
+              --build-arg BUILD_FROM=$BUILD_FROM \
+              -t $IMAGE:latest \
+              -t $IMAGE:$VERSION \
+              $GITHUB_WORKSPACE/$ADDON \
+              --push
+
             docker buildx build \
               --platform $PLATFORM \
               --build-arg BUILD_FROM=$BUILD_FROM \
