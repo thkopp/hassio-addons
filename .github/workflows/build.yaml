@@ -107,6 +107,16 @@ jobs:
               *) echo "❌ Unbekannte Plattform $PLATFORM"; exit 1 ;;
             esac
 
+
+            echo docker buildx build \
+              --platform $PLATFORM \
+              --build-arg BUILD_FROM="ghcr.io/home-assistant/${ARCH}-base:latest" \
+              -t ghcr.io/${GITHUB_REPOSITORY_OWNER}/$ADDON:latest \
+              -t ghcr.io/${GITHUB_REPOSITORY_OWNER}/$ADDON:$VERSION \
+              $GITHUB_WORKSPACE/$ADDON \
+              --push
+            
+            
             docker buildx build \
               --platform $PLATFORM \
               --build-arg BUILD_FROM="ghcr.io/home-assistant/${ARCH}-base:latest" \
