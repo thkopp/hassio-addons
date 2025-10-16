@@ -83,8 +83,10 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GHCR_PAT }}
 
-      - name: Read Addon config
-        id: read_config
+      - name: Set platform list
+        run: echo "PLATFORMS=linux/amd64 linux/arm64" >> $GITHUB_ENV
+
+      - name: Build Addon for all platforms
         run: |
           ADDON="${{ matrix.addon }}"
           CONFIG="$GITHUB_WORKSPACE/$ADDON/config.yaml"
@@ -96,39 +98,23 @@ jobs:
 
           VERSION=$(yq -r '.version' "$CONFIG")
           IMAGE=$(yq -r '.image' "$CONFIG")
-          ARCHS=$(yq -r '.arch[]' "$CONFIG")
-          BUILD_FROM_AMD64=$(yq -r '.build_from.amd64' "$CONFIG")
-          BUILD_FROM_ARM64=$(yq -r '.build_from.arm64' "$CONFIG")
+          echo "✅ Addon: $ADDON Version: $VERSION"
 
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "image=$IMAGE" >> $GITHUB_OUTPUT
-          echo "archs=$ARCHS" >> $GITHUB_OUTPUT
-          echo "build_from_amd64=$BUILD_FROM_AMD64" >> $GITHUB_OUTPUT
-          echo "build_from_arm64=$BUILD_FROM_ARM64" >> $GITHUB_OUTPUT
-          echo "✅ Addon config gelesen: $ADDON Version: $VERSION"
-
-      - name: Build and push Addon
-        run: |
-          ADDON="${{ matrix.addon }}"
-          VERSION="${{ steps.read_config.outputs.version }}"
-          IMAGE="${{ steps.read_config.outputs.image }}"
-          ARCHS="${{ steps.read_config.outputs.archs }}"
-          BF_AMD64="${{ steps.read_config.outputs.build_from_amd64 }}"
-          BF_ARM64="${{ steps.read_config.outputs.build_from_arm64 }}"
-
-          for ARCH in $ARCHS; do
-            case "$ARCH" in
-              amd64) BUILD_FROM="$BF_AMD64" ;;
-              arm64|aarch64) BUILD_FROM="$BF_ARM64" ;;
-              *) echo "❌ Unbekannte Architektur $ARCH"; exit 1 ;;
+          for PLATFORM in $PLATFORMS; do
+            case "$PLATFORM" in
+              linux/amd64) ARCH=amd64 ;;
+              linux/arm64) ARCH=aarch64 ;;
+              *) echo "❌ Unbekannte Plattform $PLATFORM"; exit 1 ;;
             esac
 
-            echo "🔨 Building $ADDON for $ARCH using $BUILD_FROM..."
+            BUILD_FROM="ghcr.io/home-assistant/${ARCH}-base:latest"
+            echo "🔨 Building $ADDON for $PLATFORM using $BUILD_FROM..."
+
             docker buildx build \
-              --platform $ARCH \
-              --build-arg BUILD_FROM="$BUILD_FROM" \
-              -t "$IMAGE:latest" \
-              -t "$IMAGE:$VERSION" \
-              "$GITHUB_WORKSPACE/$ADDON" \
+              --platform $PLATFORM \
+              --build-arg BUILD_FROM=$BUILD_FROM \
+              -t ghcr.io/${GITHUB_REPOSITORY_OWNER}/$ADDON:latest \
+              -t ghcr.io/${GITHUB_REPOSITORY_OWNER}/$ADDON:$VERSION \
+              $GITHUB_WORKSPACE/$ADDON \
               --push
           done
