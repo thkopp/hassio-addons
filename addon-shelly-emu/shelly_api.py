@@ -164,7 +164,7 @@ class ShellyEmuAPI:
             p = u * i
             p_sum += p
 
-        if not p_sum = 0:
+        if not p_sum == 0:
             corr_factor = total_power_final / p_sum
         else:
             corr_factor = 1
