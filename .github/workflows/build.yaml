@@ -107,14 +107,9 @@ jobs:
               *) echo "❌ Unbekannte Plattform $PLATFORM"; exit 1 ;;
             esac
 
-            # BUILD_FROM als Variable setzen
-            BUILD_FROM="ghcr.io/home-assistant/${ARCH}-base:latest"
-            echo "build_from=$BUILD_FROM" >> $GITHUB_ENV
-            echo "🔨 Building $ADDON for $PLATFORM using $BUILD_FROM..."
-
             docker buildx build \
               --platform $PLATFORM \
-              --build-arg BUILD_FROM=$BUILD_FROM \
+              --build-arg BUILD_FROM="ghcr.io/home-assistant/${ARCH}-base:latest" \
               -t ghcr.io/${GITHUB_REPOSITORY_OWNER}/$ADDON:latest \
               -t ghcr.io/${GITHUB_REPOSITORY_OWNER}/$ADDON:$VERSION \
               $GITHUB_WORKSPACE/$ADDON \
