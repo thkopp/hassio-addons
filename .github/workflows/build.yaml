@@ -24,11 +24,9 @@ jobs:
       - name: Detect changed addons
         id: set_addons
         run: |
-          # Optional manuelles Addon
           if [ -n "${{ github.event.inputs.addon }}" ]; then
             ADDONS_RAW="[\"${{ github.event.inputs.addon }}\"]"
           else
-            # Vorherigen Commit ermitteln
             if git rev-parse HEAD~1 >/dev/null 2>&1; then
               BEFORE=$(git rev-parse HEAD~1)
             else
@@ -47,10 +45,7 @@ jobs:
             exit 0
           fi
 
-          # In JSON-Objekte für Matrix umwandeln
           ADDONS_OBJ=$(echo "$ADDONS_RAW" | jq -c '[.[] | {addon: .}]')
-
-          echo "✅ Gefundene Addons: $ADDONS_OBJ"
           echo "addons=$ADDONS_OBJ" >> $GITHUB_OUTPUT
 
   build:
@@ -74,8 +69,6 @@ jobs:
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-        with:
-          platforms: linux/amd64,linux/arm64
 
       - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
@@ -87,49 +80,59 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GHCR_PAT }}
 
-      - name: Set platform list
-        run: echo "PLATFORMS=linux/amd64 linux/arm64" >> $GITHUB_ENV
-
-      - name: Build Addon for all platforms
+      - name: Read addon config
+        id: read_config
         run: |
-          echo "BUILD_FROM=$BUILD_FROM"
           ADDON="${{ matrix.addon }}"
           CONFIG="$GITHUB_WORKSPACE/$ADDON/config.yaml"
-          
-          # Version auslesen
+
+          if [ ! -f "$CONFIG" ]; then
+            echo "❌ config.yaml für Addon '$ADDON' nicht gefunden!"
+            exit 1
+          fi
+
           VERSION=$(yq -r '.version' "$CONFIG")
-          
-          for PLATFORM in $PLATFORMS; do
-            case "$PLATFORM" in
-              linux/amd64)
-                BUILD_FROM=$(yq -r '.build_from.amd64' "$CONFIG")
-                ;;
-              linux/arm64)
-                BUILD_FROM=$(yq -r '.build_from.arm64' "$CONFIG")
-                ;;
-              *)
-                echo "❌ Unbekannte Plattform $PLATFORM"
-                exit 1
-                ;;
-            esac
-          
-            IMAGE=$(yq -r '.image' "$CONFIG")
-          
-            echo "🔨 Building $ADDON for $PLATFORM using $BUILD_FROM -> $IMAGE:$VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-            echo docker buildx build \
-              --platform $PLATFORM \
-              --build-arg BUILD_FROM=$BUILD_FROM \
-              -t $IMAGE:latest \
-              -t $IMAGE:$VERSION \
-              $GITHUB_WORKSPACE/$ADDON \
-              --push
+          IMAGE=$(yq -r '.image' "$CONFIG")
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
 
-            docker buildx build \
-              --platform $PLATFORM \
-              --build-arg BUILD_FROM=$BUILD_FROM \
-              -t $IMAGE:latest \
-              -t $IMAGE:$VERSION \
-              $GITHUB_WORKSPACE/$ADDON \
-              --push
+          # Archs auslesen
+          ARCHS=$(yq -r '.arch | join(",")' "$CONFIG")
+          echo "archs=$ARCHS" >> $GITHUB_OUTPUT
+
+          # build_from für alle Archs sammeln
+          for ARCH in $(yq -r '.arch[]' "$CONFIG"); do
+            BF=$(yq -r ".build_from.$ARCH" "$CONFIG")
+            if [ "$BF" != "null" ]; then
+              echo "build_from_$ARCH=$BF" >> $GITHUB_OUTPUT
+            fi
           done
+
+      - name: Build and push multi-arch image
+        run: |
+          ADDON="${{ matrix.addon }}"
+          VERSION="${{ steps.read_config.outputs.version }}"
+          IMAGE="${{ steps.read_config.outputs.image }}"
+          ARCHS="${{ steps.read_config.outputs.archs }}"
+
+          # Build args pro Arch vorbereiten
+          BUILD_ARGS=""
+          for ARCH in ${ARCHS//,/ }; do
+            BF_VAR="build_from_$ARCH"
+            BF="${{ steps.read_config.outputs[BF_VAR] }}"
+            if [ -z "$BF" ] || [ "$BF" = "null" ]; then
+              echo "❌ build_from für $ARCH nicht gefunden!"
+              exit 1
+            fi
+            BUILD_ARGS="$BUILD_ARGS --build-arg BUILD_FROM_$ARCH=$BF"
+          done
+
+          echo "🔨 Building $ADDON for $ARCHS..."
+          docker buildx build \
+            --platform $ARCHS \
+            $BUILD_ARGS \
+            -t "$IMAGE:latest" \
+            -t "$IMAGE:$VERSION" \
+            "$GITHUB_WORKSPACE/$ADDON" \
+            --push
