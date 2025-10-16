@@ -22,12 +22,6 @@ def load_sensors_from_config(config_path=CONFIG_PATH):
     sensors_cfg = config.get("sensors", {})
     log.info(f"  {sensors_cfg}")
 
-    # sensors = {
-    #     "phase_l1": {"voltage": "", "current": "", "phi": "", "power": ""},
-    #     "phase_l2": {"voltage": "", "current": "", "phi": "", "power": ""},
-    #     "phase_l3": {"voltage": "", "current": "", "phi": "", "power": ""},
-    #     "total": {"power": "", "power_from_grid": "", "power_to_grid": "", "energy": ""}
-    # }
     sensors = {
         "phase_l1": {"voltage": "", "current": "", "power": ""},
         "phase_l2": {"voltage": "", "current": "", "power": ""},
@@ -78,15 +72,15 @@ async def start_servers():
     rpc_app["ha_client"] = ha_ws
     rpc_app["sensors"] = sensors
 
-    asyncio.create_task(api.start_mdns())
+    # asyncio.create_task(api.start_mdns())
 
     # RPC Server starten
-    port = int(shelly_cfg.get("port", 1010))
+    rpc_port = 80
     rpc_runner = web.AppRunner(rpc_app)
     await rpc_runner.setup()
-    rpc_site = web.TCPSite(rpc_runner, host="0.0.0.0", port=port)
-    await rpc_site.start()
-    log.info(f"✅ Shelly Emulator läuft auf Port {port}")
+    rpc_udp = web.TCPSite(rpc_runner, host="0.0.0.0", port=rpc_port)
+    await rpc_udp.start()
+    log.info(f"✅ Shelly Emulator läuft auf Port {rpc_port}")
 
     # Dashboard starten
     WEB_DIR = "/app/web"
@@ -96,12 +90,15 @@ async def start_servers():
     async def index(request):
         return web.FileResponse(os.path.join(WEB_DIR, 'index.html'))
 
-    dash_app.router.add_get('/', index)
-    dash_runner = web.AppRunner(dash_app)
-    await dash_runner.setup()
-    dash_site = web.TCPSite(dash_runner, host="0.0.0.0", port=8080)
-    await dash_site.start()
-    log.info(f"✅ Dashboard läuft auf Port 8080")
+
+    # dash_app.router.add_get('/', index)
+    # dash_runner = web.AppRunner(dash_app)
+
+    # web_port = 80
+    # await dash_runner.setup()
+    # dash_site = web.TCPSite(dash_runner, host="0.0.0.0", port=web_port)
+    # await dash_site.start()
+    # log.info(f"✅ Dashboard läuft auf Port {web_port}")
 
     try:
         while True:
@@ -111,7 +108,7 @@ async def start_servers():
     finally:
         await ha_ws.close()
         await rpc_runner.cleanup()
-        await dash_runner.cleanup()
+        # await dash_runner.cleanup()
         ws_task.cancel()
 
 if __name__ == "__main__":

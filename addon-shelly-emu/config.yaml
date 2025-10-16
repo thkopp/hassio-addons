@@ -1,6 +1,6 @@
 name: "Shelly Pro 3EM Emulator"
 description: "Emuliert ein Shelly Pro 3EM mit lokalen Sensorwerten"
-version: "0.0.1.4"
+version: "0.0.1.6"
 url: https://github.com/thkopp/hassio-addons/tree/main/addon-shelly-emu
 slug: "shelly_emulator"
 init: false
@@ -13,18 +13,12 @@ boot: "manual"
 startup: "application"
 
 ingress: true
-ingress_port: 8080
+ingress_port: 80
 panel_icon: "icon: mdi:meter-electric-outline"
 panel_title: "Shelly Pro 3EM Emu"
 
 ports:
-  1010/tcp: 1010
-  5353/udp: 5353
-
-### currently not accepted by HA
-# ports_description:
-#  1010/tcp:: "RPC port of shelly-emu for provisioning data to third party devices like a storage. Alternative port is e.g. 2220."
-#  5353/udp: "For zerofconf discovery."
+  80/tcp: 80
 
 options:
   ha_connect:
@@ -34,34 +28,6 @@ options:
   shelly_pro3em:
     device_name: "shelly-pro3em-emu"
     device_id: "shelly-pro3em-emu-1"
-    # port: 1010
-    # mDNS: false
-    # coiot: false
-    # triphase: true
-    # sliding_average: true
-
-  # sensors:
-  #   total:
-  #     power: "sensor.tibber_pulse_local_0100100700ff"
-  #     energy: "sensor.tibber_pulse_local_0100010800ff_in_k"
-
-  #   phase_l1:
-  #     voltage: "sensor.tibber_pulse_local_0100200700ff"
-  #     current: "sensor.tibber_pulse_local_01001f0700ff"
-  #     phi: "sensor.tibber_pulse_local_0100510704ff"
-  #     power: ""
-
-  #   phase_l2:
-  #     voltage: "sensor.tibber_pulse_local_0100340700ff"
-  #     current: "sensor.tibber_pulse_local_0100330700ff"
-  #     phi: "sensor.tibber_pulse_local_010051070fff"
-  #     power: ""
-
-  #   phase_l3:
-  #     voltage: "sensor.tibber_pulse_local_0100480700ff"
-  #     current: "sensor.tibber_pulse_local_0100470700ff"
-  #     phi: "sensor.tibber_pulse_local_010051071aff"
-  #     power: ""
 
   sensors:
     total:
@@ -73,19 +39,16 @@ options:
     phase_l1:
       voltage: "sensor.tibber_pulse_loftness_spannung_l1"
       current: "sensor.tibber_pulse_loftness_stromstarke_l1"
-      # phi: ""
       power: ""
 
     phase_l2:
       voltage: "sensor.tibber_pulse_loftness_spannung_l2"
       current: "sensor.tibber_pulse_loftness_stromstarke_l2"
-      # phi: ""
       power: ""
 
     phase_l3:
       voltage: "sensor.tibber_pulse_loftness_spannung_l3"
       current: "sensor.tibber_pulse_loftness_stromstarke_l3"
-      # phi: ""
       power: ""
 
 schema:
@@ -96,11 +59,6 @@ schema:
   shelly_pro3em:
     device_name: str
     device_id: str
-    # port: int
-    # mDNS: bool
-    # coiot: bool
-    # triphase: bool
-    # sliding_average: bool
 
   sensors:
     total:
@@ -112,17 +70,14 @@ schema:
     phase_l1:
       voltage: str?
       current: str?
-      # phi: str?
       power: str?
 
     phase_l2:
       voltage: str?
       current: str?
-      # phi: str?
       power: str?
 
     phase_l3:
       voltage: str?
       current: str?
-      # phi: str?
       power: str?

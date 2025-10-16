@@ -21,7 +21,7 @@ COPY web/ /app/web
 # run.sh ausführbar machen
 RUN chmod a+x /app/run.sh
 
-EXPOSE 8080 1010 5353
+EXPOSE 80
 
 # Start
 CMD [ "/app/run.sh" ]
