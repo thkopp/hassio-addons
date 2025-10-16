@@ -164,7 +164,10 @@ class ShellyEmuAPI:
             p = u * i
             p_sum += p
 
-        corr_factor = total_power_final / p_sum
+        if not p_sum = 0:
+            corr_factor = total_power_final / p_sum
+        else:
+            corr_factor = 1
 
         for phase_key in ["phase_l1", "phase_l2", "phase_l3"]:
             phase_sensors = sensors.get(phase_key, {})
