@@ -46,6 +46,7 @@ jobs:
           fi
 
           ADDONS_OBJ=$(echo "$ADDONS_RAW" | jq -c '[.[] | {addon: .}]')
+          echo "✅ Gefundene Addons: $ADDONS_OBJ"
           echo "addons=$ADDONS_OBJ" >> $GITHUB_OUTPUT
 
   build:
@@ -69,6 +70,8 @@ jobs:
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
+        with:
+          platforms: linux/amd64,linux/arm64
 
       - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
@@ -80,7 +83,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GHCR_PAT }}
 
-      - name: Read addon config
+      - name: Read Addon config
         id: read_config
         run: |
           ADDON="${{ matrix.addon }}"
@@ -92,47 +95,40 @@ jobs:
           fi
 
           VERSION=$(yq -r '.version' "$CONFIG")
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
           IMAGE=$(yq -r '.image' "$CONFIG")
+          ARCHS=$(yq -r '.arch[]' "$CONFIG")
+          BUILD_FROM_AMD64=$(yq -r '.build_from.amd64' "$CONFIG")
+          BUILD_FROM_ARM64=$(yq -r '.build_from.arm64' "$CONFIG")
+
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "image=$IMAGE" >> $GITHUB_OUTPUT
-
-          # Archs auslesen
-          ARCHS=$(yq -r '.arch | join(",")' "$CONFIG")
           echo "archs=$ARCHS" >> $GITHUB_OUTPUT
+          echo "build_from_amd64=$BUILD_FROM_AMD64" >> $GITHUB_OUTPUT
+          echo "build_from_arm64=$BUILD_FROM_ARM64" >> $GITHUB_OUTPUT
+          echo "✅ Addon config gelesen: $ADDON Version: $VERSION"
 
-          # build_from für alle Archs sammeln
-          for ARCH in $(yq -r '.arch[]' "$CONFIG"); do
-            BF=$(yq -r ".build_from.$ARCH" "$CONFIG")
-            if [ "$BF" != "null" ]; then
-              echo "build_from_$ARCH=$BF" >> $GITHUB_OUTPUT
-            fi
-          done
-
-      - name: Build and push multi-arch image
+      - name: Build and push Addon
         run: |
           ADDON="${{ matrix.addon }}"
           VERSION="${{ steps.read_config.outputs.version }}"
           IMAGE="${{ steps.read_config.outputs.image }}"
           ARCHS="${{ steps.read_config.outputs.archs }}"
+          BF_AMD64="${{ steps.read_config.outputs.build_from_amd64 }}"
+          BF_ARM64="${{ steps.read_config.outputs.build_from_arm64 }}"
 
-          # Build args pro Arch vorbereiten
-          BUILD_ARGS=""
-          for ARCH in ${ARCHS//,/ }; do
-            BF_VAR="build_from_$ARCH"
-            BF="${{ steps.read_config.outputs[BF_VAR] }}"
-            if [ -z "$BF" ] || [ "$BF" = "null" ]; then
-              echo "❌ build_from für $ARCH nicht gefunden!"
-              exit 1
-            fi
-            BUILD_ARGS="$BUILD_ARGS --build-arg BUILD_FROM_$ARCH=$BF"
+          for ARCH in $ARCHS; do
+            case "$ARCH" in
+              amd64) BUILD_FROM="$BF_AMD64" ;;
+              arm64|aarch64) BUILD_FROM="$BF_ARM64" ;;
+              *) echo "❌ Unbekannte Architektur $ARCH"; exit 1 ;;
+            esac
+
+            echo "🔨 Building $ADDON for $ARCH using $BUILD_FROM..."
+            docker buildx build \
+              --platform $ARCH \
+              --build-arg BUILD_FROM="$BUILD_FROM" \
+              -t "$IMAGE:latest" \
+              -t "$IMAGE:$VERSION" \
+              "$GITHUB_WORKSPACE/$ADDON" \
+              --push
           done
-
-          echo "🔨 Building $ADDON for $ARCHS..."
-          docker buildx build \
-            --platform $ARCHS \
-            $BUILD_ARGS \
-            -t "$IMAGE:latest" \
-            -t "$IMAGE:$VERSION" \
-            "$GITHUB_WORKSPACE/$ADDON" \
-            --push
