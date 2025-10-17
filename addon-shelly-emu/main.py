@@ -67,22 +67,24 @@ async def start_servers():
     await ha_ws.connected_event.wait()
     log.info(f"✅ Initialwerte von Home Assistant sind geladen, Cache Keys: {list(ha_ws.cache.keys())}")
 
-    # ---------------- Shelly API ----------------
+    # ---- Shelly RPC API ----
     rpc_app, api = create_app(ha_ws, shelly_cfg)
     rpc_app["ha_client"] = ha_ws
     rpc_app["sensors"] = sensors
 
     # asyncio.create_task(api.start_mdns())
 
-    # RPC Server starten
+    # ---- RPC Server starten ----
     rpc_port = 80
     rpc_runner = web.AppRunner(rpc_app)
     await rpc_runner.setup()
-    rpc_udp = web.TCPSite(rpc_runner, host="0.0.0.0", port=rpc_port)
-    await rpc_udp.start()
+    rpc_server = web.TCPSite(rpc_runner, host="0.0.0.0", port=rpc_port)
+    await rpc_server.start()
     log.info(f"✅ Shelly Emulator läuft auf Port {rpc_port}")
 
-    # Dashboard starten
+
+
+    # ---- Ingress dashboard starten ----
     WEB_DIR = "/app/web"
     dash_app = web.Application()
     dash_app.router.add_static('/static', WEB_DIR, show_index=True)
@@ -90,15 +92,13 @@ async def start_servers():
     async def index(request):
         return web.FileResponse(os.path.join(WEB_DIR, 'index.html'))
 
-
-    # dash_app.router.add_get('/', index)
-    # dash_runner = web.AppRunner(dash_app)
-
-    # web_port = 80
-    # await dash_runner.setup()
-    # dash_site = web.TCPSite(dash_runner, host="0.0.0.0", port=web_port)
-    # await dash_site.start()
-    # log.info(f"✅ Dashboard läuft auf Port {web_port}")
+    dash_app.router.add_get('/', index)
+    dash_runner = web.AppRunner(dash_app)
+    ingress_port = 8089
+    await dash_runner.setup()
+    dash_site = web.TCPSite(dash_runner, host="0.0.0.0", port=ingress_port)
+    await dash_site.start()
+    log.info(f"✅ Ingress dashboard läuft auf Port {ingress_port}")
 
     try:
         while True:
@@ -108,7 +108,7 @@ async def start_servers():
     finally:
         await ha_ws.close()
         await rpc_runner.cleanup()
-        # await dash_runner.cleanup()
+        await dash_runner.cleanup()
         ws_task.cancel()
 
 if __name__ == "__main__":
