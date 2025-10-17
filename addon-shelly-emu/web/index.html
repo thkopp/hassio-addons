@@ -174,7 +174,15 @@
 
 
 <script>
-const baseUrl = "http://homeassistant.local:8080";
+let baseUrl;
+
+if (window.location.protocol === "file:") {
+  baseUrl = "http://localhost:8080";
+} else {
+  const port = window.location.port ? `:${window.location.port}` : '';
+  baseUrl = `${window.location.protocol}//${window.location.hostname}${port}`;
+}
+
 const maxDataPoints = 30;
 const phasePowerCharts = [];
 const phasePowerData = [[], [], []];
