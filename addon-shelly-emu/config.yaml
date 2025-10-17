@@ -40,16 +40,19 @@ options:
       energy: "sensor.tibber_pulse_loftness_zahlerstand_verbrauch"
 
     phase_l1:
+      circuits: "Herd, Schlafzimmer, Bad, Keller"
       voltage: "sensor.tibber_pulse_loftness_spannung_l1"
       current: "sensor.tibber_pulse_loftness_stromstarke_l1"
       power: ""
 
     phase_l2:
+      circuits: "Herd, Wohnzimmer, Balkonkraftwerk, Waschmaschine"
       voltage: "sensor.tibber_pulse_loftness_spannung_l2"
       current: "sensor.tibber_pulse_loftness_stromstarke_l2"
       power: ""
 
     phase_l3:
+      circuits: "Herd, Küche, Geschirrspüler, Kühlschrank"
       voltage: "sensor.tibber_pulse_loftness_spannung_l3"
       current: "sensor.tibber_pulse_loftness_stromstarke_l3"
       power: ""
@@ -71,16 +74,19 @@ schema:
       energy: str?
 
     phase_l1:
+      circuits: str?
       voltage: str?
       current: str?
       power: str?
 
     phase_l2:
+      circuits: str?
       voltage: str?
       current: str?
       power: str?
 
     phase_l3:
+      circuits: str?
       voltage: str?
       current: str?
       power: str?
