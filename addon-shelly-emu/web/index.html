@@ -182,7 +182,7 @@ const rpc_port = "8080";
 if (window.location.pathname.includes("/api/hassio_ingress/")) {
   // 🟢 Home Assistant Ingress-Modus
     const ingressPrefix = window.location.pathname.split("/api/hassio_ingress/")[1].split("/")[0];
-    url = `/api/hassio_ingress_proxy/${ingressPrefix}/rpc/Shelly.GetStatus`; }
+    baseUrl = `/api/hassio_ingress_proxy/${ingressPrefix}`; }
 else if (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost") {
   // 🟠 Lokaler Test (VS Code oder Browser)
   baseUrl = `http://127.0.0.1:${rpc_port}`;   // <-- hier: Backticks!
