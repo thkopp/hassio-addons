@@ -179,10 +179,14 @@
 let baseUrl = "";
 const rpc_port = "8080";
 
-if (window.location.pathname.includes("/api/hassio_ingress/")) {
-  // 🟢 Home Assistant Ingress-Modus
-  const ingressPrefix = window.location.pathname.split("/api/hassio_ingress/")[1].split("/")[0];
-  baseUrl = `/api/hassio_ingress_proxy/${ingressPrefix}`; }
+const { protocol, hostname, pathname } = window.location;
+
+if (pathname.includes("/api/hassio_ingress/")) {
+  // 🟢 Ingress-Modus
+  const ingressId = pathname.split("/api/hassio_ingress/")[1].split("/")[0];
+  baseUrl = `http://${hostname}:${rpc_port}`;
+  console.log("Ingress detected → baseUrl =", baseUrl);
+}
 else if (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost") {
   // 🟠 Lokaler Test (VS Code oder Browser)
   baseUrl = `http://127.0.0.1:${rpc_port}`;   // <-- hier: Backticks!

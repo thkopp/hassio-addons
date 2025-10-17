@@ -22,7 +22,6 @@ panel_title: "Shelly Pro 3EM Emu"
 
 ports:
   80/tcp: 8080
-  8089/tcp: 8089
 
 options:
   ha_connect:
