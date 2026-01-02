@@ -8,23 +8,6 @@ from shelly_api import create_app
 
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger("main")
-
-def setLogLevel(inLevel: str):
-    level = levels.get(inLevel.lower())
-    if level is None:
-        level = logging.WARNING
-    logging.basicConfig(level=level)
-
-
-levels = {
-    "critical": logging.CRITICAL,
-    "error": logging.ERROR,
-    "warn": logging.WARNING,
-    "warning": logging.WARNING,
-    "info": logging.INFO,
-    "debug": logging.DEBUG,
-}
-
 CONFIG_PATH = "/data/options.json"
 
 # ---------------- Config Reader ----------------
@@ -128,6 +111,21 @@ async def start_servers():
         ws_task.cancel()
 
 
+def setLogLevel(inLevel: str):
+    levels = {
+        "critical": logging.CRITICAL,
+        "error": logging.ERROR,
+        "warn": logging.WARNING,
+        "warning": logging.WARNING,
+        "info": logging.INFO,
+        "debug": logging.DEBUG,
+    }
+
+    level = levels.get(inLevel.lower())
+    if level is None:
+        level = logging.WARNING
+    logging.basicConfig(level=level)
+
 if __name__ == "__main__":
     if not os.path.exists(CONFIG_PATH):
         raise FileNotFoundError(f"Config file not found: {CONFIG_PATH}")
@@ -136,7 +134,7 @@ if __name__ == "__main__":
         config = json.load(f)
 
     log_level = config.get("log", {}).get("level", {})
-    log.warn("✅ Log Level anpassen: {log_level}")
+    log.warning(f"✅ Log Level anpassen: {log_level}")
     setLogLevel(log_level)
 
     asyncio.run(start_servers())
