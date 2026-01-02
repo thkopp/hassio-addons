@@ -50,7 +50,7 @@ jobs:
           changed=$(echo ${changed_addons[@]} | rev | cut -c 2- | rev)
 
           if [[ -n ${changed} ]]; then
-            echo "Changed add-ons: $changed" >> $GITHUB_OUTPUT;
+            echo "Changed add-ons: $changed";
             echo "changed=true" >> $GITHUB_OUTPUT;
             echo "addons=[$changed]" >> $GITHUB_OUTPUT;
           else
@@ -83,7 +83,7 @@ jobs:
         id: check
         run: |
           if [[ "${{ steps.info.outputs.image }}" == "null" ]]; then
-            echo "Image property is not defined, skipping build" >> $GITHUB_OUTPUT;
+            echo "Image property is not defined, skipping build"
             echo "build_arch=false" >> $GITHUB_OUTPUT;
           elif [[ "${{ steps.info.outputs.architectures }}" =~ ${{ matrix.arch }} ]]; then
             echo "build_arch=true" >> $GITHUB_OUTPUT;
@@ -92,7 +92,7 @@ jobs:
                 echo "BUILD_ARGS=" >> $GITHUB_ENV;
             fi
           else
-            echo "${{ matrix.arch }} is not a valid arch for ${{ matrix.addon }}, skipping build" >> $GITHUB_OUTPUT;
+            echo "${{ matrix.arch }} is not a valid arch for ${{ matrix.addon }}, skipping build";
             echo "build_arch=false" >> $GITHUB_OUTPUT;
           fi
 
