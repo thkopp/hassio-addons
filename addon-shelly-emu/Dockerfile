@@ -1,8 +1,5 @@
-ARG BUILD_FROM_AMD64
-ARG BUILD_FROM_ARM64
-
-ARG TARGETARCH
-FROM ${TARGETARCH} ? ghcr.io/home-assistant/amd64-base:3.23 : ghcr.io/home-assistant/aarch64-base:3.23
+ARG BUILD_FROM
+FROM ${BUILD_FROM}
 
 WORKDIR /app
 
