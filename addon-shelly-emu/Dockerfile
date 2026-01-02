@@ -1,28 +1,17 @@
-ARG BUILD_FROM
-FROM $BUILD_FROM
+ARG BUILD_FROM_AMD64
+ARG BUILD_FROM_ARM64
 
+ARG TARGETARCH
+FROM ${TARGETARCH} ? ghcr.io/home-assistant/amd64-base:3.23 : ghcr.io/home-assistant/aarch64-base:3.23
 
 WORKDIR /app
 
-# Installiere Python + benötigte Pakete nur mit apk (kein pip nötig!)
-RUN apk add --no-cache \
-    python3 \
-    py3-pip \
-    py3-aiohttp \
-    py3-websockets \
-    py3-zeroconf
+RUN apk add --no-cache python3 py3-pip py3-aiohttp py3-websockets py3-zeroconf
 
-# Dateien ins Image kopieren
 COPY main.py ha_ws.py shelly_api.py /app/
 COPY run.sh /app/
-
-# Dashboard kopieren
 COPY web/ /app/web
-
-# run.sh ausführbar machen
-RUN chmod a+x /app/run.sh
+RUN chmod +x /app/run.sh
 
 EXPOSE 80
-
-# Start
 CMD [ "/app/run.sh" ]
