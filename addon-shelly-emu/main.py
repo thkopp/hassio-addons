@@ -6,8 +6,24 @@ from aiohttp import web
 from ha_ws import HomeAssistantWS
 from shelly_api import create_app
 
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger("main")
+
+def setLogLevel(inLevel: str):
+    level = levels.get(inLevel.lower())
+    if level is None:
+        level = logging.WARNING
+    logging.basicConfig(level=level)
+
+
+levels = {
+    "critical": logging.CRITICAL,
+    "error": logging.ERROR,
+    "warn": logging.WARNING,
+    "warning": logging.WARNING,
+    "info": logging.INFO,
+    "debug": logging.DEBUG,
+}
 
 CONFIG_PATH = "/data/options.json"
 
@@ -49,6 +65,9 @@ async def start_servers():
 
     with open(CONFIG_PATH, "r") as f:
         config = json.load(f)
+
+    log_level = config.get("log", {}).get("level", {})
+    setLogLevel(log_level)
 
     ha_cfg = config.get("ha_connect", {})
     shelly_cfg = config.get("shelly_pro3em", {})
