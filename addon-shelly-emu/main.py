@@ -6,7 +6,7 @@ from aiohttp import web
 from ha_ws import HomeAssistantWS
 from shelly_api import create_app
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("main")
 CONFIG_PATH = "/data/options.json"
 
@@ -124,7 +124,8 @@ def setLogLevel(inLevel: str):
     level = levels.get(inLevel.lower())
     if level is None:
         level = logging.WARNING
-    logging.basicConfig(level=level)
+
+    logger.setLevel(level)
 
 if __name__ == "__main__":
     if not os.path.exists(CONFIG_PATH):
@@ -134,7 +135,7 @@ if __name__ == "__main__":
         config = json.load(f)
 
     log_level = config.get("log", {}).get("level", {})
-    log.warning(f"✅ Log Level anpassen: {log_level}")
+    log.warning(f"✅ Log Level setzen: {log_level}")
     setLogLevel(log_level)
 
     asyncio.run(start_servers())
