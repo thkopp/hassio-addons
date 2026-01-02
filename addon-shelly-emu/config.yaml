@@ -1,16 +1,17 @@
 name: "Shelly Pro 3EM Emulator"
 description: "Emuliert ein Shelly Pro 3EM mit lokalen Sensorwerten"
-version: "0.0.1.19_1g"
+version: "0.0.1.19_1h"
 url: https://github.com/thkopp/hassio-addons/tree/main/addon-shelly-emu
 slug: "shelly_emulator"
 init: false
 arch:
   - aarch64
   - amd64
-build_from:
-  #arm64: "ghcr.io/home-assistant/aarch64-base:3.22"
-  #amd64: "ghcr.io/home-assistant/amd64-base:3.22"
-  amd64: "ghcr.io/home-assistant/amd64-base:latest"
+#build_from:
+#arm64: "ghcr.io/home-assistant/aarch64-base:3.22"
+#amd64: "ghcr.io/home-assistant/amd64-base:3.22"
+#arm64: "ghcr.io/home-assistant/aarch64-base:latest"
+#amd64: "ghcr.io/home-assistant/amd64-base:latest"
 image: "ghcr.io/thkopp/addon-shelly-emu"
 
 boot: "manual"
