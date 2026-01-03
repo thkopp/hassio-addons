@@ -108,7 +108,6 @@ jobs:
         uses: home-assistant/builder@2025.09.0
         with:
           args: |
-            ${{ env.BUILD_ARGS }} \
             --${{ matrix.arch }} \
             --target /data/${{ matrix.addon }} \
             --image "${{ steps.check.outputs.image }}" \
