@@ -54,6 +54,7 @@ jobs:
             echo "addons=[$changed]" >> $GITHUB_OUTPUT
           else
             echo "No add-on had any monitored files changed (${{ env.MONITORED_FILES }})"
+          fi
 
   build:
     needs: init
@@ -100,6 +101,7 @@ jobs:
           else
             echo "${{ matrix.arch }} is not a valid arch for ${{ matrix.addon }}, skipping build"
             echo "build_arch=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Login to GitHub Container Registry
         if: env.BUILD_ARGS != '--test'
