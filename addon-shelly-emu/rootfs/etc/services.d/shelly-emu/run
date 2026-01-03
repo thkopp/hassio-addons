@@ -1,0 +1,5 @@
+#!/usr/bin/with-contenv bashio
+
+bashio::log.info "Shelly Pro 3EM Emulator startet"
+
+exec python3 /app/main.py
