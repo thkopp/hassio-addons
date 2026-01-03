@@ -13,11 +13,5 @@ RUN apk add --no-cache \
 COPY main.py ha_ws.py shelly_api.py /app/
 COPY web/ /app/web
 
-# Service-Startskript für s6
-COPY run.sh /usr/bin/run.sh
-RUN chmod +x /usr/bin/run.sh
-
 EXPOSE 80
 
-# Kein CMD / ENTRYPOINT!
-# s6 (/init) übernimmt den Start
