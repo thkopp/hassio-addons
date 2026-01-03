@@ -1,4 +1,4 @@
-ARG BUILD_FROM
+ARG BUILD_FROM=ghcr.io/home-assistant/base:latest
 FROM ${BUILD_FROM}
 
 WORKDIR /app
@@ -11,4 +11,4 @@ COPY web/ /app/web
 RUN chmod +x /app/run.sh
 
 EXPOSE 80
-CMD [ "/app/run.sh" ]
+
