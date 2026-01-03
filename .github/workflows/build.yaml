@@ -54,7 +54,6 @@ jobs:
             echo "addons=[$changed]" >> $GITHUB_OUTPUT
           else
             echo "No add-on had any monitored files changed (${{ env.MONITORED_FILES }})"
-          fi
 
   build:
     needs: init
@@ -78,7 +77,7 @@ jobs:
         with:
           path: "./${{ matrix.addon }}"
 
-      - name: Decide build args
+      - name: Decide build args and image
         id: check
         run: |
           if [[ "${{ steps.info.outputs.image }}" == "null" ]]; then
@@ -86,11 +85,13 @@ jobs:
             echo "build_arch=false" >> $GITHUB_OUTPUT
           elif [[ "${{ steps.info.outputs.architectures }}" =~ ${{ matrix.arch }} ]]; then
             echo "build_arch=true" >> $GITHUB_OUTPUT
-            # Image name ohne Registry (wird vom Builder korrekt kombiniert)
-            image=$(echo "${{ steps.info.outputs.image }}" | cut -d'/' -f3)
+
+            # sauberer Image-Name ohne Doppelung
+            addon_name=$(echo "${{ steps.info.outputs.image }}" | sed 's/^addon-//')
+            image="addon-${addon_name}:${{ steps.info.outputs.version }}"
             echo "image=$image" >> $GITHUB_OUTPUT
 
-            # PR = Testbuild (--test), Push = Multi-Arch manifest
+            # PR = Testbuild, Push = Multi-Arch
             if [[ "${{ github.event_name }}" == "pull_request" ]]; then
               echo "BUILD_ARGS=--test" >> $GITHUB_ENV
             else
@@ -99,7 +100,6 @@ jobs:
           else
             echo "${{ matrix.arch }} is not a valid arch for ${{ matrix.addon }}, skipping build"
             echo "build_arch=false" >> $GITHUB_OUTPUT
-          fi
 
       - name: Login to GitHub Container Registry
         if: env.BUILD_ARGS != '--test'
@@ -117,6 +117,5 @@ jobs:
             ${{ env.BUILD_ARGS }} \
             --${{ matrix.arch }} \
             --target /data/${{ matrix.addon }} \
-            --image "ghcr.io/${{ github.repository_owner }}/addon-${{ steps.check.outputs.image }}" \
-            --docker-hub "ghcr.io/${{ github.repository_owner }}" \
+            --image "ghcr.io/${{ github.repository_owner }}/${{ steps.check.outputs.image }}" \
             --addon
