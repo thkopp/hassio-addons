@@ -1,5 +1,5 @@
 #!/usr/bin/with-contenv bashio
 
-bashio::log.info "Starte Shelly Emulator..."
+bashio::log.info "Starte Shelly Pro 3EM Emulator..."
 
-python3 /app/main.py
+exec python3 /app/main.py
