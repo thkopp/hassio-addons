@@ -1,6 +1,6 @@
 name: "Shelly Pro 3EM Emulator (DEV)"
 description: "Emuliert ein Shelly Pro 3EM mit lokalen Sensorwerten"
-version: "0.0.1.28-dev"
+version: "0.0.1.29-dev"
 url: https://github.com/thkopp/hassio-addons/tree/main/addon-shelly-emu
 slug: "shelly_emulator"
 
