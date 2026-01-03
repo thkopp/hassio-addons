@@ -18,16 +18,31 @@ jobs:
         arch: [amd64, aarch64]
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Add-on info
+      - name: Get add-on info
         id: info
         uses: home-assistant/actions/helpers/info@master
         with:
           path: ./addon-shelly-emu
 
-      - name: Login to GHCR
+      - name: Decide build args
+        id: args
+        run: |
+          # PR = Testbuild, Push = echter Build
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "BUILD_ARGS=--test" >> $GITHUB_ENV
+          else
+            echo "BUILD_ARGS=" >> $GITHUB_ENV
+          fi
+
+          # Sauberer Image-Name ohne Dopplungen
+          addon_name=$(echo "${{ steps.info.outputs.image }}" | sed 's/^addon-//')
+          IMAGE="addon-${addon_name}-dev:${{ steps.info.outputs.version }}"
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
+
+      - name: Login to GitHub Container Registry
         if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
@@ -39,6 +54,8 @@ jobs:
         uses: home-assistant/builder@2025.09.0
         with:
           args: |
+            ${{ env.BUILD_ARGS }} \
             --addon \
             --target /data/addon-shelly-emu \
-            --${{ matrix.arch }}
+            --${{ matrix.arch }} \
+            --image "ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE }}"
