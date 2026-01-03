@@ -125,7 +125,7 @@ def setLogLevel(inLevel: str):
     if level is None:
         level = logging.WARNING
 
-    logger.setLevel(level)
+    log.setLevel(level)
 
 if __name__ == "__main__":
     if not os.path.exists(CONFIG_PATH):
