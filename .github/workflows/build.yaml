@@ -80,23 +80,23 @@ jobs:
 
       - name: Decide build args and image
         id: check
-          run: |
-            if [[ "${{ steps.info.outputs.image }}" == "null" ]]; then
-              echo "Image property is not defined, skipping build"
-                echo "build_arch=false" >> $GITHUB_OUTPUT
-              elif [[ "${{ steps.info.outputs.architectures }}" =~ ${{ matrix.arch }} ]]; then
-                echo "build_arch=true" >> $GITHUB_OUTPUT
-                addon_name="$(echo ${{ steps.info.outputs.image }} | cut -d'/' -f3)"
-                echo "image=${addon_name}" >> $GITHUB_OUTPUT
-              if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-                echo "BUILD_ARGS=--test" >> $GITHUB_ENV
-              else
-                echo "BUILD_ARGS=" >> $GITHUB_ENV
-              fi
-            else
-              echo "${{ matrix.arch }} is not valid for ${{ matrix.addon }}, skipping build"
+        run: |
+          if [[ "${{ steps.info.outputs.image }}" == "null" ]]; then
+            echo "Image property is not defined, skipping build"
               echo "build_arch=false" >> $GITHUB_OUTPUT
+            elif [[ "${{ steps.info.outputs.architectures }}" =~ ${{ matrix.arch }} ]]; then
+              echo "build_arch=true" >> $GITHUB_OUTPUT
+              addon_name="$(echo ${{ steps.info.outputs.image }} | cut -d'/' -f3)"
+              echo "image=${addon_name}" >> $GITHUB_OUTPUT
+            if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+              echo "BUILD_ARGS=--test" >> $GITHUB_ENV
+            else
+              echo "BUILD_ARGS=" >> $GITHUB_ENV
             fi
+          else
+            echo "${{ matrix.arch }} is not valid for ${{ matrix.addon }}, skipping build"
+            echo "build_arch=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Login to GitHub Container Registry
         if: env.BUILD_ARGS != '--test'
