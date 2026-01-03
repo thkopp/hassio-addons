@@ -11,7 +11,7 @@ build_from:
   amd64: "ghcr.io/home-assistant/amd64-base:3.23"
   aarch64: "ghcr.io/home-assistant/aarch64-base:3.23"
 
-image: "ghcr.io/thkopp/addon-shelly-emu-dev"
+image: "ghcr.io/thkopp/addon-shelly-emu"
 
 init: true
 boot: "manual"
