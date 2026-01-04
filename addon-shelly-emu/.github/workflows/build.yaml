@@ -56,4 +56,6 @@ jobs:
           args: |
             --target /data/addon-shelly-emu \
             --${{ matrix.arch }} \
-            --image "ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE }}"
+            --image "ghcr.io/${{ github.repository_owner }}/addon-shelly-emu-${{ matrix.arch }}"
+
+#            --image "ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE }}"

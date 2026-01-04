@@ -1,17 +1,18 @@
 name: "Shelly Pro 3EM Emulator (DEV)"
 description: "Emuliert ein Shelly Pro 3EM mit lokalen Sensorwerten"
-version: "0.0.1.38-dev"
+version: "0.0.1.39-dev"
 url: https://github.com/thkopp/hassio-addons/tree/main/addon-shelly-emu
 slug: "shelly_emulator"
 
 arch:
   - amd64
-#  - aarch64
-build_from:
-  amd64: "ghcr.io/home-assistant/amd64-base:3.14-alpine3.23"
+  - aarch64
+# build_from:
+#  amd64: "ghcr.io/home-assistant/amd64-base:3.14-alpine3.23"
 #  aarch64: "ghcr.io/home-assistant/aarch64-base:3.14-alpine3.23"
 
-image: "ghcr.io/thkopp/addon-shelly-emu-dev"
+#image: "ghcr.io/thkopp/addon-shelly-emu-dev"
+image: ghcr.io/thkopp/addon-shelly-emu-{arch}-dev
 
 init: false
 boot: "manual"
@@ -51,19 +52,19 @@ options:
       circuits: "Herd, Schlafzimmer, Bad, Keller"
       voltage: "sensor.tibber_pulse_loftness_spannung_l1"
       current: "sensor.tibber_pulse_loftness_stromstarke_l1"
-      power: ""
+      # power: ""
 
     phase_l2:
       circuits: "Herd, Wohnzimmer, Balkonkraftwerk, Waschmaschine"
       voltage: "sensor.tibber_pulse_loftness_spannung_l2"
       current: "sensor.tibber_pulse_loftness_stromstarke_l2"
-      power: ""
+      # power: ""
 
     phase_l3:
       circuits: "Herd, Küche, Geschirrspüler, Kühlschrank"
       voltage: "sensor.tibber_pulse_loftness_spannung_l3"
       current: "sensor.tibber_pulse_loftness_stromstarke_l3"
-      power: ""
+      # power: ""
 
 schema:
   log:
@@ -85,13 +86,13 @@ schema:
       power: str?
       power_from_grid: str?
       power_to_grid: str?
-      energy: str?
+      # energy: str?
 
     phase_l1:
       circuits: str?
       voltage: str?
       current: str?
-      power: str?
+      # power: str?
 
     phase_l2:
       circuits: str?
@@ -103,4 +104,4 @@ schema:
       circuits: str?
       voltage: str?
       current: str?
-      power: str?
+      # power: str?
