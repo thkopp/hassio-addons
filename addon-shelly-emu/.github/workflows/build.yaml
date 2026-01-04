@@ -51,11 +51,9 @@ jobs:
           password: ${{ secrets.GHCR_PAT }}
 
       - name: Build add-on
-        uses: home-assistant/builder@2025.09.0
+        uses: home-assistant/builder@2025.11.0
         with:
           args: |
-            ${{ env.BUILD_ARGS }} \
-            --addon \
             --target /data/addon-shelly-emu \
             --${{ matrix.arch }} \
             --image "ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE }}"
