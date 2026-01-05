@@ -86,7 +86,7 @@ schema:
       power: str?
       power_from_grid: str?
       power_to_grid: str?
-      # energy: str?
+      energy: str?
 
     phase_l1:
       circuits: str?
@@ -98,7 +98,7 @@ schema:
       circuits: str?
       voltage: str?
       current: str?
-      power: str?
+      # power: str?
 
     phase_l3:
       circuits: str?

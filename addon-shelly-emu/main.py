@@ -75,7 +75,10 @@ async def start_servers():
 
     # ---- RPC Server starten ----
     rpc_port = 80
-    rpc_runner = web.AppRunner(rpc_app)
+    rpc_runner = web.AppRunner(
+        rpc_app,
+        access_log=None
+    )
     await rpc_runner.setup()
     rpc_server = web.TCPSite(rpc_runner, host="0.0.0.0", port=rpc_port)
     await rpc_server.start()
