@@ -70,11 +70,11 @@ def flatten_sensor_entities(sensors):
 
 # ---------------- Main Server ----------------
 async def start_servers():
-    # if not os.path.exists(CONFIG_PATH):
-    #     raise FileNotFoundError(f"Config file not found: {CONFIG_PATH}")
+    if not os.path.exists(CONFIG_PATH):
+        raise FileNotFoundError(f"Config file not found: {CONFIG_PATH}")
 
-    # with open(CONFIG_PATH, "r") as f:
-    #     config = json.load(f)
+    with open(CONFIG_PATH, "r") as f:
+        config = json.load(f)
 
     ha_cfg = config.get("ha_connect", {})
     shelly_cfg = config.get("shelly_pro3em", {})
