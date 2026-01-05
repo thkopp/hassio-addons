@@ -8,7 +8,7 @@ import logging
 import socket
 
 
-log = logging.getLogger("shelly_api")
+log = logging.getLogger(__name__)
 
 class ShellyEmuAPI:
     def __init__(self, ha_ws, shelly_cfg):

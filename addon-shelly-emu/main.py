@@ -6,12 +6,39 @@ from aiohttp import web
 from ha_ws import HomeAssistantWS
 from shelly_api import create_app
 
-logging.basicConfig(level=logging.INFO)
-log = logging.getLogger("main")
-CONFIG_PATH = "/data/options.json"
+CONFIG_PATH="/data/options.json"
+
+log = logging.getLogger(__name__)
+
+def setup_logging() -> None:
+    """
+    Zentrale Logging-Konfiguration für das Add-on
+    """
+
+    if not os.path.exists(CONFIG_PATH):
+        raise FileNotFoundError(f"Config file not found: {CONFIG_PATH}")
+    with open(CONFIG_PATH, "r") as f:
+        config = json.load(f)
+    level = config.get("log", {}).get("level", {})
+
+    numeric_level = getattr(logging, level.upper(), logging.INFO)
+
+    logging.basicConfig(
+        level=numeric_level,
+        format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+    )
+
+    # aiohttp Zugriff-Logs unterdrücken
+    logging.getLogger("aiohttp.access").setLevel(logging.WARNING)
+
+    # noisy libs optional drosseln
+    logging.getLogger("asyncio").setLevel(logging.WARNING)
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+
+
 
 # ---------------- Config Reader ----------------
-def load_sensors_from_config(config_path=CONFIG_PATH):
+def load_sensors_from_config(config_path="/data/options.json"):
     if not os.path.exists(config_path):
         raise FileNotFoundError(f"Config file not found: {config_path}")
 
@@ -114,31 +141,7 @@ async def start_servers():
         ws_task.cancel()
 
 
-def setLogLevel(inLevel: str):
-    levels = {
-        "critical": logging.CRITICAL,
-        "error": logging.ERROR,
-        "warn": logging.WARNING,
-        "warning": logging.WARNING,
-        "info": logging.INFO,
-        "debug": logging.DEBUG,
-    }
-
-    level = levels.get(inLevel.lower())
-    if level is None:
-        level = logging.WARNING
-
-    log.setLevel(level)
-
 if __name__ == "__main__":
-    if not os.path.exists(CONFIG_PATH):
-        raise FileNotFoundError(f"Config file not found: {CONFIG_PATH}")
-
-    with open(CONFIG_PATH, "r") as f:
-        config = json.load(f)
-
-    log_level = config.get("log", {}).get("level", {})
-    log.warning(f"✅ Log Level setzen: {log_level}")
-    setLogLevel(log_level)
-
+    setup_logging()
+    log.info("Shelly Pro 3EM Emulator startet")
     asyncio.run(start_servers())

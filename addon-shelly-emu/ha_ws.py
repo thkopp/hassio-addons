@@ -4,7 +4,7 @@ import logging
 import aiohttp
 from collections import OrderedDict
 
-log = logging.getLogger("ha_ws")
+log = logging.getLogger(__name__)
 
 MAX_CACHE_SIZE = 100  # Optional: max. Anzahl Entities im Cache
 

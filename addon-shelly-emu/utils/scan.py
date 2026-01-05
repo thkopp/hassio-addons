@@ -4,8 +4,8 @@ from zeroconf.asyncio import AsyncZeroconf, AsyncServiceBrowser
 import aiohttp
 import logging
 
-logging.basicConfig(level=logging.INFO)
-log = logging.getLogger("shelly_test")
+logging.basicConfig(level=logging.WARNING)
+log = logging.getLogger(__name__)
 
 class ShellyListener:
     def __init__(self):
