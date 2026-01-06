@@ -5,11 +5,9 @@ env:
 
 on:
   push:
-    branches:
-      - dev
+    branches: [dev]
   pull_request:
-    branches:
-      - dev
+    branches: [dev]
 
 jobs:
   init:
@@ -19,7 +17,7 @@ jobs:
       changed_addons: ${{ steps.changed_addons.outputs.addons }}
       changed: ${{ steps.changed_addons.outputs.changed }}
     steps:
-      - name: Check out the repository
+      - name: Checkout repository
         uses: actions/checkout@v5.0.0
 
       - name: Get changed files
@@ -37,11 +35,11 @@ jobs:
           for addon in ${{ steps.addons.outputs.addons }}; do
             if [[ "${{ steps.changed_files.outputs.all }}" =~ $addon ]]; then
               for file in ${{ env.MONITORED_FILES }}; do
-                if [[ "${{ steps.changed_files.outputs.all }}" =~ $addon/$file ]]; then
-                  if [[ ! "${changed_addons[@]}" =~ $addon ]]; then
-                    changed_addons+=("\"${addon}\",")
+                  if [[ "${{ steps.changed_files.outputs.all }}" =~ $addon/$file ]]; then
+                    if [[ ! "${changed_addons[@]}" =~ $addon ]]; then
+                      changed_addons+=("\"${addon}\",")
+                    fi
                   fi
-                fi
               done
             fi
           done
@@ -54,6 +52,8 @@ jobs:
             echo "addons=[$changed]" >> $GITHUB_OUTPUT
           else
             echo "No add-on had any monitored files changed (${{ env.MONITORED_FILES }})"
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "addons=[]" >> $GITHUB_OUTPUT
           fi
 
   build:
@@ -69,10 +69,10 @@ jobs:
       packages: write
 
     steps:
-      - name: Check out repository
+      - name: Checkout repository
         uses: actions/checkout@v5.0.0
 
-      - name: Get add-on information
+      - name: Get add-on info
         id: info
         uses: home-assistant/actions/helpers/info@master
         with:
@@ -82,19 +82,24 @@ jobs:
         id: check
         run: |
           if [[ "${{ steps.info.outputs.image }}" == "null" ]]; then
-            echo "Image property is not defined, skipping build"
-              echo "build_arch=false" >> $GITHUB_OUTPUT
-            elif [[ "${{ steps.info.outputs.architectures }}" =~ ${{ matrix.arch }} ]]; then
-              echo "build_arch=true" >> $GITHUB_OUTPUT
-              addon_name="$(echo ${{ steps.info.outputs.image }} | cut -d'/' -f3)"
-              echo "image=${addon_name}" >> $GITHUB_OUTPUT
+            echo "Image property not defined, skipping build"
+            echo "build_arch=false" >> $GITHUB_OUTPUT
+          elif [[ "${{ steps.info.outputs.architectures }}" =~ ${{ matrix.arch }} ]]; then
+            echo "build_arch=true" >> $GITHUB_OUTPUT
+
+            # sauberer Image-Name für Multi-Arch
+            addon_name=$(echo "${{ steps.info.outputs.image }}" | sed 's|.*/||')
+            image="${addon_name}:${{ steps.info.outputs.version }}"
+            echo "image=$image" >> $GITHUB_OUTPUT
+
+            # PR = Testbuild, Push = Multi-Arch
             if [[ "${{ github.event_name }}" == "pull_request" ]]; then
               echo "BUILD_ARGS=--test" >> $GITHUB_ENV
             else
               echo "BUILD_ARGS=" >> $GITHUB_ENV
             fi
           else
-            echo "${{ matrix.arch }} is not valid for ${{ matrix.addon }}, skipping build"
+            echo "${{ matrix.arch }} is not valid for ${{ matrix.addon }}, skipping"
             echo "build_arch=false" >> $GITHUB_OUTPUT
           fi
 
@@ -106,11 +111,13 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GHCR_PAT }}
 
-      - name: Build ${{ matrix.addon }} add-on
+      - name: Build add-on
         if: steps.check.outputs.build_arch == 'true'
         uses: home-assistant/builder@2025.09.0
         with:
           args: |
+            ${{ env.BUILD_ARGS }} \
             --${{ matrix.arch }} \
             --target /data/${{ matrix.addon }} \
-            --image "${{ steps.check.outputs.image }}" \
+            --image "ghcr.io/${{ github.repository_owner }}/${{ steps.info.outputs.image }}:${{ steps.info.outputs.version }}" \
+            --addon

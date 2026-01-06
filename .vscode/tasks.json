@@ -1,6 +1,34 @@
 {
-  "version": "2.0.0",
+  "version": "2.0.1",
   "tasks": [
+    {
+      "label": "Start Docker Service",
+      "type": "shell",
+      "command": "sudo service docker start",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Stop Docker Service",
+      "type": "shell",
+      "command": "sudo service docker stop",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
     {
       "label": "Start Home Assistant",
       "type": "shell",
