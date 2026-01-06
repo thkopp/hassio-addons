@@ -1,6 +1,7 @@
 name: Builder
 
 env:
+  DOCKER_REGISTRY: ghcr.io
   MONITORED_FILES: "config.yaml Dockerfile rootfs"
 
 on:

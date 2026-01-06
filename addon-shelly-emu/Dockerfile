@@ -1,4 +1,4 @@
-ARG BUILD_FROM
+ARG BUILD_FROM=ghcr.io/home-assistant/amd64-base:3.14-alpine3.23
 FROM ${BUILD_FROM}
 
 WORKDIR /app
@@ -13,9 +13,4 @@ COPY rootfs /
 COPY main.py ha_ws.py shelly_api.py /app/
 COPY web/ /app/web
 
-# COPY run.sh /
-# RUN chmod a+x /run.sh
-
 EXPOSE 80
-
-# CMD [ "/run.sh" ]
