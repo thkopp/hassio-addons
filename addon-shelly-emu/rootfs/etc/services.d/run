@@ -4,15 +4,6 @@
 # s6-overlay docs: https://github.com/just-containers/s6-overlay
 # ==============================================================================
 
-# Add your code here
-
-# Declare variables
-declare message
-
-## Get the 'message' key from the user config options.
-message=$(bashio::config 'message')
-
 bashio::log.info "${message:="Starting addon Shelly-Emu"}"
 
-## Run your program
 exec python3 /app/main.py
